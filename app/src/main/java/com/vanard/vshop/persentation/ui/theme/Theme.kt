@@ -1,4 +1,4 @@
-package com.vanard.vshop.ui.theme
+package com.vanard.vshop.persentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
