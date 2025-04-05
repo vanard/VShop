@@ -93,4 +93,8 @@ dependencies {
 
     //coil
     implementation(libs.coil)
+
+    //chucker
+    debugImplementation(libs.chucker.debug)
+    releaseImplementation(libs.chucker.release)
 }
