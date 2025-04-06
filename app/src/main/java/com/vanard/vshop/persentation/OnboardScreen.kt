@@ -126,7 +126,7 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
                 .padding(end = 16.dp)
                 .size(48.dp)
                 .align(Alignment.BottomEnd)
-                .offset(y = (-290).dp)
+                .offset(y = (-276).dp)
                 .alpha(0.7f)
 
         )
