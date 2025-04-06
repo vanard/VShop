@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -44,8 +42,6 @@ import com.vanard.vshop.common.UIState
 import com.vanard.vshop.common.toastMsg
 import com.vanard.vshop.domain.model.getAllCategories
 import com.vanard.vshop.domain.model.getCategories
-import com.vanard.vshop.domain.model.listCategory
-import com.vanard.vshop.persentation.components.CategoryItemContent
 import com.vanard.vshop.persentation.components.ChipGroup
 import com.vanard.vshop.persentation.components.ShopItemContent
 import com.vanard.vshop.persentation.ui.theme.VShopTheme
@@ -146,17 +142,6 @@ fun HomeScreen(
                             )
                         }
                     }
-//                    LazyRow(
-//                        contentPadding = PaddingValues(vertical = 20.dp),
-//                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-//                    ) {
-//                        items(items = listCategory, key = { it.name }) {
-//                            if (it.name == listCategory.first().name)
-//                                CategoryItemContent(it.name, true)
-//                            else
-//                                CategoryItemContent(it.name, false)
-//                        }
-//                    }
                     ChipGroup(
                         categories = getAllCategories(),
                         selectedCategories = viewModel.selectedCategory.value,
