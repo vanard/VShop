@@ -3,7 +3,7 @@ package com.vanard.vshop.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import com.vanard.vshop.R
+import com.vanard.resources.R
 
 data class NavItem(
 //    val title: String,

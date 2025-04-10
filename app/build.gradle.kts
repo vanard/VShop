@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.plugin)
-    alias(libs.plugins.ksp)
 }
 
 android {
@@ -73,28 +72,21 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    implementation(libs.hilt.navigation)
-
-    //retrofit
-    implementation(libs.bundles.retrofit)
+//    implementation(libs.hilt.navigation)
 
     //datastore
-    implementation(libs.datastore)
+//    implementation(libs.datastore)
 
     //workmanager
-    implementation(libs.workmanager)
+//    implementation(libs.workmanager)
 
     //paging
-    implementation(libs.bundles.paging)
+//    implementation(libs.bundles.paging)
 
-    //room
-    implementation(libs.bundles.room)
-    ksp(libs.room.compiler)
-
-    //coil
-    implementation(libs.coil)
-
-    //chucker
-    debugImplementation(libs.chucker.debug)
-    releaseImplementation(libs.chucker.release)
+    //
+    implementation(project(":core:ui"))
+    implementation(project(":core:common"))
+    implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation(project(":feature"))
 }

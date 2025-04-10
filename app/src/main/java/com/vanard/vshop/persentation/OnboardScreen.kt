@@ -33,9 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanard.vshop.R
-import com.vanard.vshop.common.toastMsg
-import com.vanard.vshop.persentation.ui.theme.VShopTheme
+import com.vanard.resources.R
+import com.vanard.common.util.toastMsg
+import com.vanard.ui.theme.VShopTheme
 
 @Composable
 fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
