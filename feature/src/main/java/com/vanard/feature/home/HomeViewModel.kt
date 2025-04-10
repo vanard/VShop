@@ -1,21 +1,17 @@
-package com.vanard.vshop.persentation.screens
+package com.vanard.feature.home
 
 import android.util.Log
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanard.vshop.common.UIState
-import com.vanard.vshop.common.fetchState
-import com.vanard.vshop.data.remote.ProductList
-import com.vanard.vshop.domain.HomeUseCase
-import com.vanard.vshop.domain.model.Categories
-import com.vanard.vshop.domain.repository.ProductRepository
+import com.vanard.core.common.UIState
+import com.vanard.domain.model.Categories
+import com.vanard.domain.model.ProductList
+import com.vanard.domain.usecase.HomeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,8 +24,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val usecase: HomeUseCase) : ViewModel() {
-    private val _uiState: MutableStateFlow<UIState<ProductList>> = MutableStateFlow(UIState.Loading)
+class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : ViewModel() {
+    private val _uiState: MutableStateFlow<UIState<ProductList>> = MutableStateFlow(
+        UIState.Loading
+    )
     val uiState: StateFlow<UIState<ProductList>>
         get() = _uiState
 
@@ -56,27 +54,24 @@ class HomeViewModel @Inject constructor(private val usecase: HomeUseCase) : View
         viewModelScope.launch {
             _uiState.value = UIState.Loading
             val result = withContext(Dispatchers.IO) {
-                usecase.getAllProducts()
+                useCase.getAllProducts()
             }
             Log.d(TAG, "getProducts: $result")
-            if (result.isNotEmpty()) {
-                _uiState.value = UIState.Success(ProductList(result))
-            }
-//            when (result) {
-//                is UIState.Success -> {
-//                    _uiState.value = UIState.Success(result.data)
-//                }
-//                else -> _uiState.value = UIState.Error("BRUH")
-//            }
+            useCase.getAllProducts()
+                .collect { state ->
+                    when (state) {
+                        is UIState.Success -> {
+                            val products = ProductList(state.data)
+                            Log.d(TAG, "getProducts: $products")
+                            _uiState.value = UIState.Success(products)
+                        }
 
-//                usecase.getAllProducts()
-//                    .collect { products ->
-//                    Log.d(TAG, "getProducts: ${products.body()}")
-//                    if (products.body() != null)
-//                        _uiState.value = UIState.Success(products.body()!!)
-//                    else
-//                        _uiState.value = UIState.Error("BRUH")
-//                }
+                        else -> {
+                            Log.d(TAG, "getProducts: error")
+                            _uiState.value = UIState.Error("BruH")
+                        }
+                    }
+                }
         }
     }
 
