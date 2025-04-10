@@ -1,18 +1,18 @@
-package com.vanard.vshop.data.remote
+package com.vanard.data.remote.dto
 
-data class CartList(val carts: List<Cart>)
+data class CartListDto(val carts: List<CartDto>)
 
-data class Cart(
+data class CartDto(
     val id: Long,
     val userId: Long,
     val date: String? = null,
-    val products: List<ProductItem>,
+    val products: List<ProductItemDto>,
 //    @JsonProperty("__v")
 //    val v: Long,
     val __v: Long? = null,
 )
 
-data class ProductItem(
+data class ProductItemDto(
     val productId: Long,
     val quantity: Long,
 )
