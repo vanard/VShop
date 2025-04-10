@@ -8,9 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="paint_01">#292526</color>
-    <color name="paint_02">#787676</color>
-    <color name="paint_03">#A3A1A2</color>
-    <color name="paint_04">#F2F2F2</color>
-    <color name="paint_05">#121111</color>
+<!--    <color name="paint_01">#292526</color>-->
+<!--    <color name="paint_02">#787676</color>-->
+<!--    <color name="paint_03">#A3A1A2</color>-->
+<!--    <color name="paint_04">#F2F2F2</color>-->
+<!--    <color name="paint_05">#121111</color>-->
 </resources>
