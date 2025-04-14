@@ -10,7 +10,7 @@ const val PRODUCTS_BY_CATEGORY_ENDPOINT = "products/category/{category}"
 const val PRODUCT_BY_ID_ENDPOINT = "products/{id}"
 const val PRODUCTS_ENDPOINT = "products"
 
-interface ApiService {
+interface ProductService {
 
     @GET(PRODUCTS_ENDPOINT)
     suspend fun getAllProducts(): Response<List<ProductDto>>

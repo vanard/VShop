@@ -4,14 +4,14 @@ import com.vanard.core.common.UIState
 import com.vanard.core.common.fetchState
 import com.vanard.core.common.map
 import com.vanard.data.mappers.toDomain
-import com.vanard.data.remote.ApiService
+import com.vanard.data.remote.ProductService
 import com.vanard.domain.model.Product
 import com.vanard.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class ProductRepositoryImpl @Inject constructor(private val productServices: ApiService) :
+class ProductRepositoryImpl @Inject constructor(private val productServices: ProductService) :
     ProductRepository {
 
     override suspend fun getAllProducts(): Flow<UIState<List<Product>>> = flow {
