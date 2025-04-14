@@ -1,12 +1,11 @@
 package com.vanard.data.di
 
-import com.vanard.data.remote.ApiService
+import com.vanard.data.repositoryImpl.CartRepositoryImpl
 import com.vanard.data.repositoryImpl.ProductRepositoryImpl
+import com.vanard.domain.repository.CartRepository
 import com.vanard.domain.repository.ProductRepository
-import com.vanard.domain.usecase.HomeUseCase
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -20,6 +19,12 @@ abstract class RepositoryModule {
     abstract fun bindProductRepository(
         productRepositoryImpl: ProductRepositoryImpl
     ): ProductRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindCartRepository(
+        cartRepositoryImpl: CartRepositoryImpl
+    ): CartRepository
 
 }
 
