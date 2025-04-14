@@ -1,10 +1,8 @@
 package com.vanard.feature.home
 
 import android.util.Log
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanard.core.common.UIState
@@ -13,17 +11,14 @@ import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.HomeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -33,11 +28,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : ViewModel() {
-
-//    sealed interface SearchState {
-//        object Empty : SearchState
-//        data class UserQuery(val query: String) : SearchState
-//    }
 
     private val _uiState: MutableStateFlow<UIState<ProductList>> = MutableStateFlow(
         UIState.Loading
@@ -52,13 +42,16 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
     val isSearching = _isSearching.asStateFlow()
 
     private val _products = MutableStateFlow(ProductList(listOf()))
+    private val _ogProducts = MutableStateFlow(ProductList(listOf()))
+
+    private val _sort = MutableStateFlow(Sort.ASC)
 
     @OptIn(FlowPreview::class)
     val products = searchText
         .debounce(300L)
         .onEach { _isSearching.update { true } }
         .combine(_products) { text, products ->
-            if(text.isBlank()) {
+            if (text.isBlank()) {
                 products
             } else {
                 delay(500L)
@@ -75,51 +68,31 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
             _products.value
         )
 
-//    private val searchTextFieldState = TextFieldState()
-
     private val _selectedCategory: MutableState<Categories?> = mutableStateOf(Categories.AllItems)
     val selectedCategory
         get() = _selectedCategory
 
     fun selectCategory(categories: Categories?) {
         _selectedCategory.value = categories
+        _products.value = if (categories == null || categories == Categories.AllItems) {
+            _ogProducts.value.copy()
+        } else {
+            _ogProducts.value.copy(
+                products = _ogProducts.value.products.filter {
+                    it.doestMatchQuery(categories.value)
+                }
+            )
+        }
     }
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
-    private fun setProducts(products: ProductList){
+    private fun setProducts(products: ProductList) {
+        _ogProducts.value = products
         _products.value = products
     }
-
-//    val searchState = snapshotFlow { searchTextFieldState.text }
-//        .debounce(500)
-//        .mapLatest { if (it.isBlank()) "Search clothes.." else it.toString() }
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(),
-//            initialValue = ""
-//        )
-
-//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-//    private val searchTextState: StateFlow<SearchState> = snapshotFlow { searchTextFieldState.text }
-//        .debounce(500)
-//        .mapLatest { if (it.isBlank()) SearchState.Empty else SearchState.UserQuery(it.toString()) }
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 2000),
-//            initialValue = SearchState.Empty
-//        )
-
-//    fun observeUserSearch() = viewModelScope.launch {
-//        searchTextState.collectLatest { searchState ->
-//            when (searchState) {
-//                is SearchState.Empty -> _uiState.update { UIState.Success(ProductList(listOf())) }
-//                is SearchState.UserQuery -> searchAllCharacters(searchState.query)
-//            }
-//        }
-//    }
 
     fun getProducts() {
         viewModelScope.launch {
@@ -145,6 +118,20 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
                     }
                 }
         }
+    }
+
+    fun sortProducts() {
+        _sort.value = if (_sort.value == Sort.ASC) Sort.DESC else Sort.ASC
+        val sorted = if (_sort.value == Sort.ASC)
+            _products.value.products.sortedBy { it.title }
+        else
+            _products.value.products.sortedByDescending { it.title }
+
+        _products.value = _products.value.copy(products = sorted)
+    }
+
+    enum class Sort {
+        ASC, DESC
     }
 
     companion object {
