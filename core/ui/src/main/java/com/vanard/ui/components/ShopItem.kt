@@ -36,6 +36,7 @@ import com.vanard.resources.R
 import com.vanard.domain.model.Product
 import com.vanard.domain.model.dummyProduct
 import com.vanard.ui.theme.VShopTheme
+import com.vanard.ui.theme.Yellow
 
 @Composable
 fun ShopItemContent(
@@ -72,11 +73,11 @@ fun ShopItemContent(
 //                    .clip(RoundedCornerShape(16.dp))
 //            )
             IconButton(
-                onClick = onFavClick, modifier = modifier
+                onClick = onFavClick, modifier = Modifier
+                    .align(Alignment.TopEnd)
                     .padding(8.dp)
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.paint_01))
-                    .align(Alignment.TopEnd)
                     .size(24.dp)
             ) {
                 Icon(
@@ -96,21 +97,24 @@ fun ShopItemContent(
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
         ) {
             Text(
                 text = "$${product.price}", color = colorResource(R.color.paint_05),
-                fontWeight = FontWeight.SemiBold, modifier = modifier.weight(1f)
+                fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)
             )
             Icon(
                 Icons.Outlined.Star,
-                tint = Color.Yellow,
+                tint = Yellow,
                 contentDescription = null,
-                modifier = modifier.padding(end = 4.dp)
+                modifier = Modifier.padding(end = 4.dp)
             )
-            Text(text = "${product.rating?.rate ?: ""}", modifier = modifier.weight(0.7f))
+            Text(
+                text = "${product.rating?.rate ?: ""}",
+//                modifier = Modifier.weight(0.7f)
+            )
         }
     }
 }
