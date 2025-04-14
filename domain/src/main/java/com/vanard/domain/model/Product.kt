@@ -10,7 +10,18 @@ data class Product(
     val category: String,
     val image: String,
     val rating: Rating? = null,
-)
+) {
+    fun doestMatchQuery(query: String): Boolean {
+        val matchCombinations = listOf(
+            title,
+            category
+        )
+
+        return matchCombinations.any {
+            it.contains(query, ignoreCase = true)
+        }
+    }
+}
 
 data class Rating(
     val rate: Double,
