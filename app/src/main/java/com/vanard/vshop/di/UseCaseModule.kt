@@ -1,6 +1,8 @@
 package com.vanard.vshop.di
 
+import com.vanard.domain.repository.CartRepository
 import com.vanard.domain.repository.ProductRepository
+import com.vanard.domain.usecase.CartUseCase
 import com.vanard.domain.usecase.HomeUseCase
 import dagger.Module
 import dagger.Provides
@@ -16,6 +18,13 @@ object UseCaseModule {
         repository: ProductRepository
     ): HomeUseCase {
         return HomeUseCase(repository)
+    }
+
+    @Provides
+    fun provideCartUseCase(
+        repository: CartRepository
+    ): CartUseCase {
+        return CartUseCase(repository)
     }
 
 }

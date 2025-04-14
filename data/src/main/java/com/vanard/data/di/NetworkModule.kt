@@ -57,7 +57,10 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun getApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
     fun getProductService(retrofit: Retrofit): ProductService = retrofit.create(ProductService::class.java)
+
+    @Singleton
+    @Provides
+    fun getCartService(retrofit: Retrofit): CartService = retrofit.create(CartService::class.java)
 
 }
