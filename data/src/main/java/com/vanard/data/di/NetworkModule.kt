@@ -3,7 +3,8 @@ package com.vanard.data.di
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.vanard.common.constants.BASE_URL
-import com.vanard.data.remote.ApiService
+import com.vanard.data.remote.CartService
+import com.vanard.data.remote.ProductService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,5 +58,6 @@ object NetworkModule {
     @Singleton
     @Provides
     fun getApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    fun getProductService(retrofit: Retrofit): ProductService = retrofit.create(ProductService::class.java)
 
 }

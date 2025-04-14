@@ -12,7 +12,7 @@ import dagger.hilt.android.components.ViewModelComponent
 object UseCaseModule {
 
     @Provides
-    fun provideHomesUseCase(
+    fun provideHomeUseCase(
         repository: ProductRepository
     ): HomeUseCase {
         return HomeUseCase(repository)
