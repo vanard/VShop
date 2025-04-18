@@ -2,6 +2,7 @@ package com.vanard.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.vanard.data.dao.CartDao
 import com.vanard.data.dao.ProductDao
 import com.vanard.data.db.AppDatabase
 import dagger.Module
@@ -26,5 +27,8 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideItemDao(db: AppDatabase): ProductDao = db.ProductDao()
+    fun provideProductDao(db: AppDatabase): ProductDao = db.ProductDao()
+
+    @Provides
+    fun provideCartDao(db: AppDatabase): CartDao = db.CartDao()
 }
