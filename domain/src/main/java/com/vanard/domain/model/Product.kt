@@ -10,6 +10,7 @@ data class Product(
     val category: String,
     val image: String,
     val rating: Rating? = null,
+    var isFavorite: Boolean
 ) {
     fun doestMatchQuery(query: String): Boolean {
         val matchCombinations = listOf(
@@ -35,5 +36,6 @@ val dummyProduct = Product(
     "Dummy Product",
     "Dummy",
     image = "https://blog.sribu.com/wp-content/uploads/2024/10/t-shirt-7973405_1280.jpg",
-    rating = Rating(2.9, 14)
+    rating = Rating(2.9, 14),
+    false
 )

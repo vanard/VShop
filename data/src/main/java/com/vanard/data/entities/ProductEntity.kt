@@ -12,7 +12,8 @@ data class ProductEntity(
     val description: String,
     val category: String,
     val image: String,
-    @Embedded val rating: RatingEntity? = null,
+    @Embedded val rating: RatingEntity?,
+    var isFavorite: Boolean
 )
 
 data class RatingEntity(

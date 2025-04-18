@@ -15,7 +15,8 @@ fun ProductDto.toDomain(): Product {
         this.description,
         this.category,
         this.image,
-        this.rating?.toDomain()
+        this.rating?.toDomain(),
+        false
     )
 }
 
@@ -33,7 +34,8 @@ fun ProductDto.toEntity(): ProductEntity {
         this.description,
         this.category,
         this.image,
-        this.rating?.toEntity()
+        this.rating?.toEntity(),
+        false
     )
 }
 
@@ -51,11 +53,30 @@ fun ProductEntity.toDomain(): Product {
         this.description,
         this.category,
         this.image,
-        this.rating?.toDomain()
+        this.rating?.toDomain(),
+        this.isFavorite
     )
 }
 
 fun RatingEntity.toDomain(): Rating {
     return Rating(this.rate, this.count)
+}
+
+//
+fun Product.toEntity(): ProductEntity {
+    return ProductEntity(
+        this.id,
+        this.title,
+        this.price,
+        this.description,
+        this.category,
+        this.image,
+        this.rating?.toEntity(),
+        this.isFavorite
+    )
+}
+
+fun Rating.toEntity(): RatingEntity {
+    return RatingEntity(this.rate, this.count)
 }
 
