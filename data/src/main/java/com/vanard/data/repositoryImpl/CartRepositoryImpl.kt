@@ -1,6 +1,6 @@
 package com.vanard.data.repositoryImpl
 
-import com.vanard.core.common.UIState
+import com.vanard.common.UIState
 import com.vanard.core.common.fetchState
 import com.vanard.core.common.map
 import com.vanard.data.mappers.toDomain

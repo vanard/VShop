@@ -1,6 +1,6 @@
 package com.vanard.domain.usecase
 
-import com.vanard.core.common.UIState
+import com.vanard.common.UIState
 import com.vanard.domain.model.Product
 import com.vanard.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow

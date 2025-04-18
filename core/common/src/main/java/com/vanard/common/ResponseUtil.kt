@@ -1,6 +1,7 @@
 package com.vanard.core.common
 
 import com.google.gson.JsonSyntaxException
+import com.vanard.common.UIState
 import retrofit2.Response
 import java.io.IOException
 import java.net.UnknownHostException
