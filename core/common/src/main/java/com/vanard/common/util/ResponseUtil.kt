@@ -2,6 +2,11 @@ package com.vanard.core.common
 
 import com.google.gson.JsonSyntaxException
 import com.vanard.common.UIState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 import java.net.UnknownHostException
@@ -45,3 +50,21 @@ inline fun <T, R> UIState<T>.map(transform: (T) -> R): UIState<R> = when (this) 
     is UIState.Error -> this
     is UIState.Loading -> this
 }
+
+suspend fun <T> Response<T>.safeBodyOrThrow(): T {
+    if (isSuccessful) {
+        return body() ?: throw NullPointerException("Response body is null")
+    } else {
+        throw HttpException(this)
+    }
+}
+
+fun <T> Flow<T>.asUiState(): Flow<UIState<T>> =
+    this
+        .map { data ->
+            UIState.Success(data)
+        }.catch {
+            UIState.Error("Something went wrong")
+        }.onStart {
+            UIState.Loading
+        }
