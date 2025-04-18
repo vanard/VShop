@@ -28,7 +28,7 @@ fun CategoryItemContent(
     val shapeBg = RoundedCornerShape(8.dp)
     val colorBorder = if (isSelected)
         colorResource(R.color.paint_01)
-    else colorResource(R.color.paint_03)
+    else colorResource(R.color.colorDFDEDE)
     val colorBg = if (isSelected)
         colorResource(R.color.paint_01)
     else
@@ -56,7 +56,7 @@ fun CategoryItemContent(
             Text(
                 fontSize = 12.sp, text = category, color = if (isSelected)
                     colorResource(R.color.white)
-                else colorResource(R.color.paint_05)
+                else colorResource(R.color.paint_01)
             )
         }
     }
