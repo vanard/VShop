@@ -13,3 +13,5 @@ data class ProductItem(
     val productId: Long,
     val quantity: Long,
 )
+
+val dummyCart = Cart(0, 123123123, "", listOf(ProductItem(123123123, 2)))
