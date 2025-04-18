@@ -11,4 +11,8 @@ class HomeUseCase (private val productRepository: ProductRepository) {
         return productRepository.getAllProducts()
     }
 
+    suspend fun updateProduct(product: Product) {
+        productRepository.updateProduct(product)
+    }
+
 }
