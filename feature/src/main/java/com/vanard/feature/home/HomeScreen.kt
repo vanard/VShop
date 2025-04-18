@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanard.common.util.toastMsg
-import com.vanard.core.common.UIState
+import com.vanard.common.UIState
 import com.vanard.domain.model.getAllCategories
 import com.vanard.domain.model.getCategories
 import com.vanard.resources.R
@@ -51,7 +51,6 @@ import com.vanard.ui.components.ChipGroup
 import com.vanard.ui.components.CustomSearchBar
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.theme.VShopTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)

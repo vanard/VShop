@@ -5,7 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanard.core.common.UIState
+import com.vanard.common.UIState
 import com.vanard.domain.model.Categories
 import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.HomeUseCase
