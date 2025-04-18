@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanard.common.UIState
 import com.vanard.domain.model.Categories
+import com.vanard.domain.model.Product
 import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.HomeUseCase
+import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -27,13 +30,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : ViewModel() {
-
-    private val _uiState: MutableStateFlow<UIState<ProductList>> = MutableStateFlow(
-        UIState.Loading
-    )
-    val uiState: StateFlow<UIState<ProductList>>
-        get() = _uiState.asStateFlow()
+class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : BaseViewModel() {
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
@@ -95,8 +92,12 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
     }
 
     fun getProducts() {
+        if (isLoaded) return
+        isLoaded = true
+
         viewModelScope.launch {
-            _uiState.value = UIState.Loading
+//            _uiState.value = UIState.Loading
+            setLoading()
             val result = withContext(Dispatchers.IO) {
                 useCase.getAllProducts()
             }
@@ -108,12 +109,14 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
                             val products = ProductList(state.data)
                             Log.d(TAG, "getProducts: $products")
                             setProducts(products)
-                            _uiState.value = UIState.Success(products)
+//                            _uiState.value = UIState.Success(products)
+                            setSuccess()
                         }
 
                         else -> {
                             Log.d(TAG, "getProducts: error")
-                            _uiState.value = UIState.Error("BruH")
+//                            _uiState.value = UIState.Error("BruH")
+                            setError("Something went wrong")
                         }
                     }
                 }
@@ -128,6 +131,30 @@ class HomeViewModel @Inject constructor(private val useCase: HomeUseCase) : View
             _products.value.products.sortedByDescending { it.title }
 
         _products.value = _products.value.copy(products = sorted)
+    }
+
+//    fun pressFavorite(product: Product) {
+//        val newListValue = _products.value.copy(products = _products.value.products.map { item ->
+//            if (item.id == product.id) product else item
+//        })
+//
+//        setProducts(newListValue)
+//        updateProductItem(product)
+//    }
+
+    fun updateProductItem(product: Product) {
+        viewModelScope.launch {
+//            Log.d(TAG, "pressFavorite before: $product")
+            Log.d(TAG, "pressFavorite list before: \n${_products.value.products.take(3)}")
+            setLoading()
+            product.apply {
+                isFavorite = !isFavorite
+            }
+//            Log.d(TAG, "pressFavorite after: $product")
+            useCase.updateProduct(product)
+            setSuccess()
+            Log.d(TAG, "pressFavorite list after: \n${_products.value.products.take(3)}")
+        }
     }
 
     enum class Sort {
