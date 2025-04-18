@@ -1,0 +1,18 @@
+package com.vanard.domain.usecase
+
+import com.vanard.common.UIState
+import com.vanard.domain.model.Product
+import com.vanard.domain.repository.ProductRepository
+import kotlinx.coroutines.flow.Flow
+
+class WhishlistUseCase (private val productRepository: ProductRepository) {
+
+    suspend fun getAllProducts(): Flow<UIState<List<Product>>> {
+        return productRepository.getAllFavoriteProducts()
+    }
+
+    suspend fun updateProduct(product: Product) {
+        productRepository.updateProduct(product)
+    }
+
+}
