@@ -2,9 +2,10 @@ package com.vanard.data.repositoryImpl
 
 import com.vanard.common.UIState
 import com.vanard.common.util.networkBoundResourceUiState
-import com.vanard.common.util.safeBodyOrThrow
+import com.vanard.core.common.asUiState
 import com.vanard.core.common.fetchState
 import com.vanard.core.common.map
+import com.vanard.core.common.safeBodyOrThrow
 import com.vanard.data.dao.ProductDao
 import com.vanard.data.mappers.toDomain
 import com.vanard.data.mappers.toEntity
@@ -16,7 +17,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class ProductRepositoryImpl @Inject constructor(private val productServices: ProductService, private val productDao: ProductDao) :
+class ProductRepositoryImpl @Inject constructor(
+    private val productServices: ProductService,
+    private val productDao: ProductDao
+) :
     ProductRepository {
 
     override suspend fun getAllProducts(): Flow<UIState<List<Product>>> =
@@ -28,7 +32,7 @@ class ProductRepositoryImpl @Inject constructor(private val productServices: Pro
                 productServices.getAllProducts().safeBodyOrThrow()
             },
             saveFetchResult = { dtoList ->
-                productDao.deleteAllProducts() // Optional: see earlier notes
+//                productDao.deleteAllProducts()
                 productDao.insertAllProduct(dtoList.map { it.toEntity() })
             },
             shouldFetch = { localData ->
@@ -38,16 +42,29 @@ class ProductRepositoryImpl @Inject constructor(private val productServices: Pro
 
     override suspend fun getProductById(id: Int): Flow<UIState<Product>> = flow {
         val result = fetchState { productServices.getProductById(id) }
-        emit(result.map{ dto ->
+        emit(result.map { dto ->
             dto.toDomain()
         })
     }
 
-    override suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>> = flow {
-        val result = fetchState { productServices.getProductsByCategory(category) }
-        emit(result.map { dtoList ->
-            dtoList.map { it.toDomain() }
-        })
+    override suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>> =
+        flow {
+            val result = fetchState { productServices.getProductsByCategory(category) }
+            emit(result.map { dtoList ->
+                dtoList.map { it.toDomain() }
+            })
+        }
+
+    override suspend fun getAllFavoriteProducts(): Flow<UIState<List<Product>>> {
+        val flowProduct = productDao.getAllFavoriteProducts().map { list ->
+            list.map { it.toDomain() }
+        }.asUiState()
+
+        return flowProduct
+    }
+
+    override suspend fun updateProduct(product: Product) {
+        productDao.updateProduct(product.toEntity())
     }
 
 }

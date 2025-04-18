@@ -8,4 +8,7 @@ interface ProductRepository {
     suspend fun getAllProducts(): Flow<UIState<List<Product>>>
     suspend fun getProductById(id: Int): Flow<UIState<Product>>
     suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>>
+
+    suspend fun getAllFavoriteProducts(): Flow<UIState<List<Product>>>
+    suspend fun updateProduct(product: Product)
 }
