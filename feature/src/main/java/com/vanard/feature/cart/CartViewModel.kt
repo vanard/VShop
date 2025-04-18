@@ -3,10 +3,8 @@ package com.vanard.feature.cart
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanard.core.common.UIState
-import com.vanard.domain.model.Cart
+import com.vanard.common.UIState
 import com.vanard.domain.model.CartList
-import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.CartUseCase
 import com.vanard.feature.home.HomeViewModel.Companion.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +18,7 @@ import javax.inject.Inject
 class CartViewModel @Inject constructor(private val useCase: CartUseCase) : ViewModel() {
 
     private val _carts = MutableStateFlow(CartList(listOf()))
+    val carts get() = _carts
 
     fun getCarts() {
         viewModelScope.launch {
