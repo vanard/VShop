@@ -1,5 +1,6 @@
 package com.vanard.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -32,9 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.vanard.common.util.toastMsg
-import com.vanard.resources.R
 import com.vanard.domain.model.Product
 import com.vanard.domain.model.dummyProduct
+import com.vanard.resources.R
 import com.vanard.ui.theme.VShopTheme
 import com.vanard.ui.theme.Yellow
 
@@ -45,7 +45,12 @@ fun ShopItemContent(
     onFavClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-//    Log.d("ShopItem", "ShopItemContent: ${product.image}")
+    Log.d("ShopItem", "ShopItemContent: $product")
+
+    val iconHeart =
+        if (product.isFavorite) painterResource(R.drawable.heart_bold)
+        else painterResource(R.drawable.heart)
+
     Column(
         modifier
             .width(160.dp)
@@ -73,15 +78,24 @@ fun ShopItemContent(
 //                    .clip(RoundedCornerShape(16.dp))
 //            )
             IconButton(
-                onClick = onFavClick, modifier = Modifier
+                onClick = {
+                    onFavClick()
+                },
+                modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.paint_01))
                     .size(24.dp)
             ) {
+//                val iconHeart =
+//                    if (product.isFavorite) painterResource(R.drawable.heart_bold)
+//                    else painterResource(R.drawable.heart)
+
                 Icon(
-                    painter = painterResource(R.drawable.heart),
+                    painter = iconHeart,
+//                    painter = if (product.isFavorite) painterResource(R.drawable.heart_bold)
+//                    else painterResource(R.drawable.heart),
                     tint = colorResource(R.color.white),
                     contentDescription = null,
                     modifier = modifier.size(12.dp)
