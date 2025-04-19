@@ -1,9 +1,6 @@
 package com.vanard.vshop.persentation
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,25 +9,25 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.vanard.vshop.R
-import com.vanard.vshop.navigation.NavItem
+import com.vanard.feature.ComingSoonScreen
+import com.vanard.feature.cart.CartScreen
+import com.vanard.resources.R
 import com.vanard.vshop.navigation.Screen
 import com.vanard.vshop.navigation.getAllNavigationItem
-import com.vanard.vshop.persentation.screens.HomeScreen
-import com.vanard.vshop.persentation.ui.theme.VShopTheme
+import com.vanard.feature.home.HomeScreen
+import com.vanard.feature.wishlist.WishlistScreen
+import com.vanard.ui.theme.VShopTheme
 
 @Composable
 fun VShopApp(
@@ -54,13 +51,12 @@ fun VShopApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Onboard.route) {
-                OnboardScreen(navigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Onboard.route) {
-                            inclusive = true
-                        }
-                    }
-                })
+                OnboardScreen(
+                    navigateToHome = navController.navigateTo(
+                        Screen.Home.route,
+                        Screen.Onboard.route
+                    )
+                )
             }
             composable(Screen.Home.route) {
 //                HomeScreen(
@@ -71,7 +67,11 @@ fun VShopApp(
                 HomeScreen()
             }
             composable(Screen.Whishlist.route) {
-                HomeScreen()
+                WishlistScreen(
+                    navigateBack = {
+                        navController.navigateUp()
+                    },
+                )
             }
             composable(Screen.Cart.route) {
                 val context = LocalContext.current
@@ -80,11 +80,15 @@ fun VShopApp(
 //                        shareOrder(context, message)
 //                    }
 //                )
-                HomeScreen()
+                CartScreen(
+                    navigateBack = {
+                        navController.navigateUp()
+                    },
+                )
             }
             composable(Screen.Profile.route) {
 //                ProfileScreen()
-                HomeScreen()
+                ComingSoonScreen()
             }
 //            composable(
 //                route = Screen.Detail.route,
@@ -138,56 +142,51 @@ private fun BottomBar(
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-//        val navigationItems = listOf(
-//            NavItem(
-//                icon = painterResource(R.drawable.home_2),
-//                selectedIcon = painterResource(R.drawable.home_2_bold),
-//                screen = Screen.Home
-//            ),
-//            NavItem(
-//                icon = painterResource(R.drawable.heart),
-//                selectedIcon = painterResource(R.drawable.heart_bold),
-//                screen = Screen.Whishlist
-//            ),
-//            NavItem(
-//                icon = painterResource(R.drawable.shopping_bag),
-//                selectedIcon = painterResource(R.drawable.shopping_bag_bold),
-//                screen = Screen.Cart
-//            ),
-//            NavItem(
-//                icon = painterResource(R.drawable.profile),
-//                selectedIcon = painterResource(R.drawable.profile_bulk),
-//                screen = Screen.Profile
-//            ),
-//        )
 
         getAllNavigationItem().map { item ->
             NavigationBarItem(
                 icon = {
                     Icon(
                         painter = if (currentRoute == item.screen.route) item.selectedIcon else item.icon,
-//                        tint = colorResource(R.color.paint_04),
                         contentDescription = null
                     )
                 },
                 selected = currentRoute == item.screen.route,
                 onClick = {
-                    navController.navigate(item.screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                    if (currentRoute != item.screen.route)
+                        navController.navigate(item.screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            restoreState = true
+                            launchSingleTop = true
                         }
-                        restoreState = true
-                        launchSingleTop = true
-                    }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = colorResource(R.color.paint_04),
                     selectedTextColor = colorResource(R.color.paint_04),
                     indicatorColor = Color.Transparent,
-
-                    )
+                )
             )
         }
+    }
+}
+
+fun NavController.navigateTo(route: String, from: String): () -> Unit = {
+    this.navigate(route) {
+        popUpTo(from) {
+            inclusive = true
+        }
+    }
+}
+
+fun NavController.navigateToSaveState(route: String, from: String): () -> Unit = {
+    this.navigate(route) {
+        popUpTo(this@navigateToSaveState.graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }
 
