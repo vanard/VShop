@@ -5,7 +5,7 @@ import com.vanard.domain.model.Product
 import com.vanard.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 
-class WhishlistUseCase (private val productRepository: ProductRepository) {
+class WishlistUseCase (private val productRepository: ProductRepository) {
 
     suspend fun getAllProducts(): Flow<UIState<List<Product>>> {
         return productRepository.getAllFavoriteProducts()

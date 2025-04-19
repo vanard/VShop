@@ -1,19 +1,22 @@
-package com.vanard.feature.whishlist
+package com.vanard.feature.wishlist
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.vanard.common.UIState
+import com.vanard.domain.model.Product
 import com.vanard.domain.model.ProductList
-import com.vanard.domain.usecase.WhishlistUseCase
+import com.vanard.domain.usecase.WishlistUseCase
 import com.vanard.feature.home.HomeViewModel.Companion.TAG
 import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WhishlistViewModel @Inject constructor(private val useCase: WhishlistUseCase) :
+class WishlistViewModel @Inject constructor(private val useCase: WishlistUseCase) :
     BaseViewModel() {
 
 //    private val _searchText = MutableStateFlow("")
