@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,6 +52,7 @@ import com.vanard.feature.ComingSoonScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.ChipGroup
 import com.vanard.ui.components.CustomSearchBar
+import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.theme.VShopTheme
 import kotlinx.coroutines.launch
@@ -105,7 +107,10 @@ fun HomeScreen(
                     ChipGroup(
                         categories = getAllCategories(),
                         selectedCategories = viewModel.selectedCategory.value,
-                        onSelectedChanged = {})
+                        onSelectedChanged = {}
+                    )
+
+                    LoadingSingleTop()
                 }
             }
 
@@ -175,11 +180,7 @@ fun HomeScreen(
                         })
 
                     if (isSearching) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
+                        LoadingSingleTop()
                     }
 
                     LazyVerticalStaggeredGrid(
@@ -189,9 +190,9 @@ fun HomeScreen(
                         verticalItemSpacing = 24.dp,
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         content = {
-                            items(
+                            itemsIndexed(
                                 items = products.products,
-                                key = { it.id }) { product ->
+                                key = { index, _ -> index }) { index, product ->
                                 ShopItemContent(
                                     product,
                                     onSelectedProduct = {
@@ -204,6 +205,10 @@ fun HomeScreen(
                                             "${product.title.firstWords(2)} has been added to your favorites."
 
 //                                        viewModel::pressFavorite
+//                                        product.apply {
+//                                            product.copy(isFavorite = !this.isFavorite)
+//                                        }
+
                                         viewModel.updateProductItem(product)
                                         context.toastMsg(message)
                                     },

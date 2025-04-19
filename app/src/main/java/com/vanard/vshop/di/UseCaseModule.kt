@@ -4,7 +4,7 @@ import com.vanard.domain.repository.CartRepository
 import com.vanard.domain.repository.ProductRepository
 import com.vanard.domain.usecase.CartUseCase
 import com.vanard.domain.usecase.HomeUseCase
-import com.vanard.domain.usecase.WhishlistUseCase
+import com.vanard.domain.usecase.WishlistUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,8 +31,8 @@ object UseCaseModule {
     @Provides
     fun provideWhishListUseCase(
         repository: ProductRepository
-    ): WhishlistUseCase {
-        return WhishlistUseCase(repository)
+    ): WishlistUseCase {
+        return WishlistUseCase(repository)
     }
 
 }
