@@ -75,4 +75,16 @@ class WishlistViewModel @Inject constructor(private val useCase: WishlistUseCase
         }
     }
 
+    fun updateProductItem(product: Product) {
+        viewModelScope.launch {
+            setLoading()
+            product.apply {
+                isFavorite = !isFavorite
+            }
+            useCase.updateProduct(product)
+            delay(30)
+            setSuccess()
+        }
+    }
+
 }
