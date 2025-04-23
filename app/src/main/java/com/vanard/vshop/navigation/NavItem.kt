@@ -23,7 +23,7 @@ fun getAllNavigationItem(): List<NavItem> {
         NavItem(
             icon = painterResource(R.drawable.heart),
             selectedIcon = painterResource(R.drawable.heart_bold),
-            screen = Screen.Whishlist
+            screen = Screen.Wishlist
         ),
         NavItem(
             icon = painterResource(R.drawable.shopping_bag),

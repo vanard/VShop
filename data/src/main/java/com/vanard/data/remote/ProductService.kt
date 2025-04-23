@@ -16,7 +16,7 @@ interface ProductService {
     suspend fun getAllProducts(): Response<List<ProductDto>>
 
     @GET(PRODUCT_BY_ID_ENDPOINT)
-    suspend fun getProductById(@Path(RouteConstant.ID) id: Int): Response<ProductDto>
+    suspend fun getProductById(@Path(RouteConstant.ID) id: Long): Response<ProductDto>
 
     @GET(PRODUCTS_BY_CATEGORY_ENDPOINT)
     suspend fun getProductsByCategory(@Path(RouteConstant.CATEGORY) category: String): Response<List<ProductDto>>
