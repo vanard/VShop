@@ -9,14 +9,15 @@ import com.vanard.domain.model.Rating
 
 fun ProductDto.toDomain(): Product {
     return Product(
-        this.id,
-        this.title,
-        this.price,
-        this.description,
-        this.category,
-        this.image,
-        this.rating?.toDomain(),
-        false
+        id = this.id,
+        title = this.title,
+        price = this.price,
+        description = this.description,
+        category = this.category,
+        image = this.image,
+        rating = this.rating?.toDomain(),
+        isFavorite = false,
+        quantityInCart = 0
     )
 }
 
@@ -28,14 +29,15 @@ fun RatingDto.toDomain(): Rating {
 
 fun ProductDto.toEntity(): ProductEntity {
     return ProductEntity(
-        this.id,
-        this.title,
-        this.price,
-        this.description,
-        this.category,
-        this.image,
-        this.rating?.toEntity(),
-        false
+        id = this.id,
+        title = this.title,
+        price = this.price,
+        description = this.description,
+        category = this.category,
+        image = this.image,
+        rating = this.rating?.toEntity(),
+        isFavorite = false,
+        quantityInCart = 0
     )
 }
 
@@ -47,14 +49,15 @@ fun RatingDto.toEntity(): RatingEntity {
 
 fun ProductEntity.toDomain(): Product {
     return Product(
-        this.id,
-        this.title,
-        this.price,
-        this.description,
-        this.category,
-        this.image,
-        this.rating?.toDomain(),
-        this.isFavorite
+        id = this.id,
+        title = this.title,
+        price = this.price,
+        description = this.description,
+        category = this.category,
+        image = this.image,
+        rating = this.rating?.toDomain(),
+        isFavorite = this.isFavorite,
+        quantityInCart = quantityInCart
     )
 }
 
@@ -65,14 +68,15 @@ fun RatingEntity.toDomain(): Rating {
 //
 fun Product.toEntity(): ProductEntity {
     return ProductEntity(
-        this.id,
-        this.title,
-        this.price,
-        this.description,
-        this.category,
-        this.image,
-        this.rating?.toEntity(),
-        this.isFavorite
+        id = this.id,
+        title = this.title,
+        price = this.price,
+        description = this.description,
+        category = this.category,
+        image = this.image,
+        rating = this.rating?.toEntity(),
+        isFavorite = this.isFavorite,
+        quantityInCart = this.quantityInCart
     )
 }
 

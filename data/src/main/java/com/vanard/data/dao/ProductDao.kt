@@ -21,6 +21,18 @@ interface ProductDao {
     @Update
     suspend fun updateProduct(product: ProductEntity)
 
+    @Query("UPDATE products_item SET quantityInCart = quantityInCart + 1 WHERE id = :id")
+    suspend fun increaseQuantity(id: Long)
+
+    @Query("UPDATE products_item SET quantityInCart = quantityInCart - 1 WHERE id = :id AND quantityInCart > 1")
+    suspend fun decreaseQuantity(id: Long)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM products_item WHERE id = :id AND quantityInCart > 0)")
+    suspend fun getProductInChartExist(id: Long): Boolean
+
+    @Query("SELECT * FROM products_item WHERE quantityInCart > 0")
+    fun getAllProductInChart(): Flow<List<ProductEntity>>
+
     @Query("SELECT * FROM products_item WHERE id = :id")
     fun getProductById(id:Long): Flow<ProductEntity?>
 

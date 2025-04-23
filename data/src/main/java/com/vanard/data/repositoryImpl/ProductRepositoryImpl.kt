@@ -40,12 +40,28 @@ class ProductRepositoryImpl @Inject constructor(
             }
         )
 
-    override suspend fun getProductById(id: Int): Flow<UIState<Product>> = flow {
-        val result = fetchState { productServices.getProductById(id) }
-        emit(result.map { dto ->
-            dto.toDomain()
-        })
-    }
+//    override suspend fun getProductById(id: Long): Flow<UIState<Product?>> = flow {
+//        val result = fetchState { productServices.getProductById(id) }
+//        emit(result.map { dto ->
+//            dto.toDomain()
+//        })
+//    }
+
+    override suspend fun getProductById(id: Long): Flow<UIState<Product?>> =
+        networkBoundResourceUiState(
+            query = {
+                productDao.getProductById(id).map { product -> product?.toDomain() }
+            },
+            fetch = {
+                productServices.getProductById(id).safeBodyOrThrow()
+            },
+            saveFetchResult = { productDto ->
+                productDao.insertProduct(productDto.toEntity())
+            },
+            shouldFetch = { localData ->
+                localData == null
+            }
+        )
 
     override suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>> =
         flow {
@@ -65,6 +81,26 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun updateProduct(product: Product) {
         productDao.updateProduct(product.toEntity())
+    }
+
+    override suspend fun getAllLocalCarts(): Flow<UIState<List<Product>>> {
+        val flowProduct = productDao.getAllProductInChart().map { list ->
+            list.map { it.toDomain() }
+        }.asUiState()
+
+        return flowProduct
+    }
+
+    override suspend fun checkCartItemExist(id: Long): Boolean {
+        return productDao.getProductInChartExist(id)
+    }
+
+    override suspend fun increaseQuantityCart(id: Long) {
+        productDao.increaseQuantity(id)
+    }
+
+    override suspend fun decreaseQuantityCart(id: Long) {
+        productDao.decreaseQuantity(id)
     }
 
 }
