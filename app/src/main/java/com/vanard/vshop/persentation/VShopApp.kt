@@ -1,5 +1,6 @@
 package com.vanard.vshop.persentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -16,12 +17,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.vanard.feature.ComingSoonScreen
+import com.vanard.feature.ErrorScreen
 import com.vanard.feature.cart.CartScreen
+import com.vanard.feature.detail.DetailScreen
 import com.vanard.resources.R
 import com.vanard.vshop.navigation.Screen
 import com.vanard.vshop.navigation.getAllNavigationItem
@@ -59,14 +64,11 @@ fun VShopApp(
                 )
             }
             composable(Screen.Home.route) {
-//                HomeScreen(
-//                    navigateToDetail = { rewardId ->
-//                        navController.navigate(Screen.DetailReward.createRoute(rewardId))
-//                    }
-//                )
-                HomeScreen()
+                HomeScreen(navigateToDetail = { productId ->
+                    navController.navigate(Screen.Detail.detailRoute(productId))
+                })
             }
-            composable(Screen.Whishlist.route) {
+            composable(Screen.Wishlist.route) {
                 WishlistScreen(
                     navigateBack = {
                         navController.navigateUp()
@@ -88,20 +90,24 @@ fun VShopApp(
             }
             composable(Screen.Profile.route) {
 //                ProfileScreen()
-                ComingSoonScreen()
+//                ComingSoonScreen()
+                ErrorScreen()
             }
-//            composable(
-//                route = Screen.Detail.route,
-//                arguments = listOf(navArgument("rewardId") { type = NavType.LongType }),
-//            ) {
-//                val id = it.arguments?.getLong("rewardId") ?: -1L
-//                DetailScreen(
-//                    rewardId = id,
-//                    navigateBack = {
-//                        navController.navigateUp()
-//                    },
-//                    navigateToCart = {
-//                        navController.popBackStack()
+            composable(
+                route = Screen.Detail.route,
+                arguments = listOf(navArgument("id") { type = NavType.LongType }),
+            ) {
+                val id = it.arguments?.getLong("id") ?: -1L
+                Log.d(TAG, "detail: $id")
+//                ComingSoonScreen()
+                DetailScreen(
+                    productId = id,
+                    navigateBack = {
+                        navController.navigateUp()
+                    },
+                    navigateToCart = {
+                        navController.popBackStack()
+                        navController.navigateToSaveState(route = Screen.Cart.route)
 //                        navController.navigate(Screen.Cart.route) {
 //                            popUpTo(navController.graph.findStartDestination().id) {
 //                                saveState = true
@@ -109,9 +115,9 @@ fun VShopApp(
 //                            launchSingleTop = true
 //                            restoreState = true
 //                        }
-//                    }
-//                )
-//            }
+                    }
+                )
+            }
         }
     }
 }
@@ -172,7 +178,7 @@ private fun BottomBar(
     }
 }
 
-fun NavController.navigateTo(route: String, from: String): () -> Unit = {
+private fun NavController.navigateTo(route: String, from: String): () -> Unit = {
     this.navigate(route) {
         popUpTo(from) {
             inclusive = true
@@ -180,7 +186,7 @@ fun NavController.navigateTo(route: String, from: String): () -> Unit = {
     }
 }
 
-fun NavController.navigateToSaveState(route: String, from: String): () -> Unit = {
+private fun NavController.navigateToSaveState(route: String): () -> Unit = {
     this.navigate(route) {
         popUpTo(this@navigateToSaveState.graph.findStartDestination().id) {
             saveState = true
@@ -197,3 +203,5 @@ fun VShopAppPreview() {
         VShopApp()
     }
 }
+
+const val TAG = "VShopApp"
