@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vanard.common.UIState
 import com.vanard.domain.model.Product
 import com.vanard.domain.model.ProductList
-import com.vanard.domain.usecase.WishlistUseCase
-import com.vanard.feature.home.HomeViewModel.Companion.TAG
+import com.vanard.domain.usecase.ProductUseCase
 import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WishlistViewModel @Inject constructor(private val useCase: WishlistUseCase) :
+class WishlistViewModel @Inject constructor(private val useCase: ProductUseCase) :
     BaseViewModel() {
 
 //    private val _searchText = MutableStateFlow("")
@@ -54,9 +53,9 @@ class WishlistViewModel @Inject constructor(private val useCase: WishlistUseCase
 //        _searchText.value = text
 //    }
 
-    fun getAllProducts() {
+    fun getAllFavoriteProducts() {
         safeScope.launch {
-            useCase.getAllProducts().collect { state ->
+            useCase.getAllFavoriteProducts().collect { state ->
                 when (state) {
                     is UIState.Success -> {
                         val products = ProductList(state.data)
@@ -87,4 +86,7 @@ class WishlistViewModel @Inject constructor(private val useCase: WishlistUseCase
         }
     }
 
+    companion object {
+        private const val TAG = "WishlistViewModel"
+    }
 }
