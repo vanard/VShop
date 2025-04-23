@@ -1,5 +1,6 @@
 package com.vanard.feature.home
 
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -26,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,6 +51,7 @@ import com.vanard.common.util.firstWords
 import com.vanard.domain.model.getAllCategories
 import com.vanard.domain.model.getCategories
 import com.vanard.feature.ComingSoonScreen
+import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.ChipGroup
 import com.vanard.ui.components.CustomSearchBar
@@ -60,9 +63,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
+    navigateToDetail: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-//    navigateToDetail: (Long) -> Unit,
 ) {
 //    viewModel.uiState.collectAsState(initial = UIState.Loading).value.let { uiState ->
     viewModel.uiState.collectAsState().value.let { uiState ->
@@ -99,7 +102,7 @@ fun HomeScreen(
                             Icon(
                                 painter = painterResource(R.drawable.setting_4),
                                 tint = Color.White,
-                                contentDescription = null
+                                contentDescription = "Icon"
                             )
                         }
                     }
@@ -123,6 +126,14 @@ fun HomeScreen(
                 val searchText by viewModel.searchText.collectAsState()
                 val products by viewModel.products.collectAsState()
                 val isSearching by viewModel.isSearching.collectAsState()
+
+//                LaunchedEffect(products) {
+//                    println("Products updated: ${products.products.map { it.isFavorite }}")
+//                    Log.d(
+//                        "HomeScreen",
+//                        "Products updated: ${products.products.map { it.isFavorite }}"
+//                    )
+//                }
 
                 fun scrollToTop() {
                     coroutineScope.launch {
@@ -190,13 +201,14 @@ fun HomeScreen(
                         verticalItemSpacing = 24.dp,
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         content = {
-                            itemsIndexed(
+                            items(
                                 items = products.products,
-                                key = { index, _ -> index }) { index, product ->
+                                key = { it.id }) { product ->
                                 ShopItemContent(
                                     product,
                                     onSelectedProduct = {
-                                        context.toastMsg("Product ${product.title}")
+//                                        context.toastMsg("Product ${product.title}")
+                                        navigateToDetail(product.id)
                                     },
                                     onFavClick = {
                                         val message = if (product.isFavorite)
@@ -223,7 +235,7 @@ fun HomeScreen(
             }
 
             is UIState.Error -> {
-//                ComingSoonScreen()
+                ErrorScreen()
             }
         }
     }
@@ -270,7 +282,7 @@ fun HeaderHomeScreen(modifier: Modifier = Modifier) {
 fun HomeScreenPreview(modifier: Modifier = Modifier) {
     VShopTheme {
 //        Scaffold(modifier = modifier.fillMaxSize()) { padding ->
-        HomeScreen()
+        HomeScreen({})
 //        }
     }
 }
