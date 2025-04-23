@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanard.common.UIState
 import com.vanard.feature.ComingSoonScreen
+import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.FavoriteItemContent
 import com.vanard.ui.components.LoadingSingleTop
@@ -49,7 +50,7 @@ fun WishlistScreen(
     viewModel.uiState.collectAsState().value.let { uiState ->
         when (uiState) {
             is UIState.Loading -> {
-                viewModel.getAllProducts()
+                viewModel.getAllFavoriteProducts()
                 Column(
                     modifier = modifier
                         .fillMaxSize()
@@ -61,7 +62,7 @@ fun WishlistScreen(
             }
 
             is UIState.Error -> {
-                ComingSoonScreen()
+                ErrorScreen()
             }
 
             is UIState.Success -> {
@@ -150,4 +151,4 @@ fun HeaderWishlistScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier
     }
 }
 
-const val TAG = "WishlistScreen"
+private const val TAG = "WishlistScreen"
