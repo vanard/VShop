@@ -1,12 +1,9 @@
 package com.vanard.feature.home
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,16 +15,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -45,14 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.vanard.common.util.toastMsg
 import com.vanard.common.UIState
 import com.vanard.common.util.firstWords
+import com.vanard.common.util.toastMsg
 import com.vanard.domain.model.getAllCategories
 import com.vanard.domain.model.getCategories
-import com.vanard.feature.ComingSoonScreen
 import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
+import com.vanard.ui.components.AvatarImage
 import com.vanard.ui.components.ChipGroup
 import com.vanard.ui.components.CustomSearchBar
 import com.vanard.ui.components.LoadingSingleTop
@@ -265,12 +257,9 @@ fun HeaderHomeScreen(modifier: Modifier = Modifier) {
             )
         }
 
-        Image(
+        AvatarImage(
             painter = painterResource(R.drawable.product1),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier = modifier
-                .clip(CircleShape)
+            modifier = Modifier
                 .size(60.dp)
                 .align(Alignment.CenterVertically)
         )

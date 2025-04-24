@@ -72,18 +72,6 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-//    implementation(libs.hilt.navigation)
-
-    //datastore
-//    implementation(libs.datastore)
-
-    //workmanager
-//    implementation(libs.workmanager)
-
-    //paging
-//    implementation(libs.bundles.paging)
-
-    //
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
     implementation(project(":data"))
