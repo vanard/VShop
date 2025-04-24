@@ -1,5 +1,7 @@
 package com.vanard.feature.cart
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanard.common.UIState
 import com.vanard.common.util.formalDecimal
 import com.vanard.common.util.toastMsg
+import com.vanard.domain.model.Product
 import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.CartItemContent
@@ -67,19 +70,17 @@ fun CartScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    HeaderCartScreen(navigateBack)
+                    HeaderCartScreen(navigateBack = navigateBack)
                     Spacer(modifier = Modifier.weight(1f))
-                    FooterCartScreen(0.0)
+                    FooterCartScreen(total = 0.0)
                 }
             }
 
             is UIState.Success -> {
-//                var total by remember { mutableDoubleStateOf(0.0) }
-
                 val configuration = LocalConfiguration.current
                 val screenHeight = configuration.screenHeightDp.dp
-
-//                val context = LocalContext.current
+                //
+                val context = LocalContext.current
                 val total by viewModel.total.collectAsState()
 //                val carts by viewModel.carts.collectAsState()
                 val localCarts by viewModel.localCarts.collectAsState()
@@ -92,7 +93,8 @@ fun CartScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    HeaderCartScreen(navigateBack)
+                    //
+                    HeaderCartScreen(context, navigateBack)
 
                     LazyColumn(
                         state = scrollState,
@@ -148,8 +150,11 @@ fun CartScreen(
 
                         })
 
+                    //
                     FooterCartScreen(
-                        total = total
+                        context = context,
+                        total = total,
+                        cartList = localCarts
                     )
                 }
             }
@@ -162,8 +167,11 @@ fun CartScreen(
 }
 
 @Composable
-fun HeaderCartScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+fun HeaderCartScreen(
+    context: Context? = null,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(vertical = 16.dp)
@@ -194,7 +202,7 @@ fun HeaderCartScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier) {
         )
 
         IconButton(onClick = {
-            context.toastMsg("Coming Soon")
+            context?.toastMsg("Coming Soon")
         }) {
             Icon(
                 painter = painterResource(R.drawable.menu),
@@ -213,7 +221,13 @@ fun HeaderCartScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FooterCartScreen(total: Double, modifier: Modifier = Modifier) {
+fun FooterCartScreen(
+    context: Context? = null,
+    total: Double,
+    cartList: List<Product> = listOf(),
+    modifier: Modifier = Modifier
+) {
+    val totalString = "$${total.formalDecimal()}"
     Text(
         "Shipping Information",
         fontWeight = FontWeight.Bold,
@@ -247,7 +261,9 @@ fun FooterCartScreen(total: Double, modifier: Modifier = Modifier) {
     }
 
     Button(
-        onClick = {},
+        onClick = {
+            shareOrder(context!!, getSummary(totalString, cartList))
+        },
         colors = ButtonDefaults.buttonColors(colorResource(R.color.paint_01)),
         modifier = Modifier
             .fillMaxWidth()
@@ -260,6 +276,26 @@ fun FooterCartScreen(total: Double, modifier: Modifier = Modifier) {
             modifier = modifier.padding(vertical = 16.dp)
         )
     }
+}
+
+//TODO
+private fun getSummary(totalString: String, localCarts: List<Product>): String =
+    "Total $totalString from ${localCarts.size} products"
+
+//TODO
+private fun shareOrder(context: Context, summary: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, "Order")
+        putExtra(Intent.EXTRA_TEXT, summary)
+    }
+
+    context.startActivity(
+        Intent.createChooser(
+            intent,
+            "Order"
+        )
+    )
 }
 
 @Preview(showBackground = true)
