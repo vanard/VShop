@@ -1,16 +1,15 @@
 package com.vanard.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,37 +26,37 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.vanard.common.util.toastMsg
 import com.vanard.domain.model.Cart
-import com.vanard.domain.model.CartItem
+import com.vanard.domain.model.Product
 import com.vanard.domain.model.dummyCart
-import com.vanard.domain.model.dummyCartItem
+import com.vanard.domain.model.dummyProduct
 import com.vanard.resources.R
 import com.vanard.ui.theme.VShopTheme
 
 @Composable
 fun CartItemContent(
-    cartItem: CartItem,
+    cartItem: Product,
+//    cartItem: Cart,
     onSelectedProduct: () -> Unit,
+    menuActions: RemoveMenuActions,
+    countActions: CountViewActions,
     modifier: Modifier = Modifier
 ) {
-//    Log.d("ShopItem", "ShopItemContent: ${product.image}")
+    Log.d("CartItemContent", "product: $cartItem")
     Row(
         modifier
             .fillMaxWidth()
             .clickable(onClick = onSelectedProduct)
     ) {
-                    AsyncImage(
-                model = cartItem.image,
-//                model = "https://ryusei.co.id/cdn/shop/articles/0bbcdd3148a2240345684a406e375e8f.jpg?v=1659525141&width=2048",
-                contentDescription = "Image Product",
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .size(70.dp)
-                    .align(Alignment.CenterVertically)
-            )
+        ProductImage(
+            cartItem.image,
+            modifier = modifier
+                .clip(RoundedCornerShape(16.dp))
+                .size(70.dp)
+                .align(Alignment.CenterVertically)
+        )
+
 //        Image(
 //            painter = painterResource(R.drawable.product1),
 //            contentDescription = "Image Product",
@@ -70,7 +69,7 @@ fun CartItemContent(
 
         Column(
             modifier = modifier
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 16.dp)
                 .weight(1f)
         ) {
             Text(
@@ -94,62 +93,38 @@ fun CartItemContent(
         }
 
         Column {
-            IconButton(
-                onClick = onSelectedProduct, modifier = Modifier
-                    .padding(8.dp)
-                    .background(color = Color.Transparent)
-                    .size(24.dp)
-                    .align(Alignment.End)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.menu1),
-                    tint = colorResource(R.color.paint_05),
-                    contentDescription = null,
-                    modifier = modifier.size(12.dp)
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-            ) {
+            Box(modifier = Modifier.align(Alignment.End)) {
                 IconButton(
-                    onClick = onSelectedProduct, modifier = Modifier
+                    onClick = menuActions.onMenuClick, modifier = Modifier
                         .padding(8.dp)
-                        .border(1.dp, color = colorResource(R.color.paint_03), shape = CircleShape)
-                        .clip(CircleShape)
                         .background(color = Color.Transparent)
                         .size(24.dp)
+                        .align(Alignment.TopEnd)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.minus),
+                        painter = painterResource(R.drawable.menu1),
                         tint = colorResource(R.color.paint_05),
                         contentDescription = null,
                         modifier = modifier.size(12.dp)
                     )
                 }
 
-                Text("4", modifier = modifier.padding(start = 4.dp))
-
-                IconButton(
-                    onClick = onSelectedProduct, modifier = Modifier
-                        .padding(8.dp)
-                        .border(1.dp, color = colorResource(R.color.paint_03), shape = CircleShape)
-                        .clip(CircleShape)
-                        .background(color = Color.Transparent)
-                        .size(24.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.add),
-                        tint = colorResource(R.color.paint_05),
-                        contentDescription = null,
-                        modifier = modifier.size(12.dp)
-                    )
+                ShopDropdownMenu(menuActions.showMenu, menuActions.onDismissMenu) {
+                    menuActions.onRemoveItem()
+                    menuActions.onDismissMenu()
                 }
-
             }
+
+            CountView(
+                currentQuantity = cartItem.quantityInCart,
+                onPlusClick = { quantity ->
+                    countActions.onPlusClick(quantity)
+                },
+                onMinusClick = { quantity ->
+                    countActions.onMinusClick(quantity)
+                }
+            )
+
         }
     }
 }
@@ -160,8 +135,19 @@ fun CartItemPreview() {
     val context = LocalContext.current
     VShopTheme {
         CartItemContent(
-            dummyCartItem,
+            dummyProduct,
             onSelectedProduct = { context.toastMsg("Click Product") },
+            menuActions = RemoveMenuActions(
+                onMenuClick = { context.toastMsg("Click Product") },
+                showMenu = true,
+                onDismissMenu = { context.toastMsg("Click Product") },
+                onRemoveItem = { context.toastMsg("Click Product") },
+            ),
+            countActions = CountViewActions(
+                onPlusClick = { context.toastMsg("Click Product") },
+                onMinusClick = { context.toastMsg("Click Product") },
+            )
+
         )
     }
 }
