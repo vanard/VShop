@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -23,16 +22,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.vanard.feature.ComingSoonScreen
-import com.vanard.feature.ErrorScreen
 import com.vanard.feature.cart.CartScreen
 import com.vanard.feature.detail.DetailScreen
+import com.vanard.feature.home.HomeScreen
+import com.vanard.feature.profile.ProfileScreen
+import com.vanard.feature.wishlist.WishlistScreen
 import com.vanard.resources.R
+import com.vanard.ui.theme.VShopTheme
 import com.vanard.vshop.navigation.Screen
 import com.vanard.vshop.navigation.getAllNavigationItem
-import com.vanard.feature.home.HomeScreen
-import com.vanard.feature.wishlist.WishlistScreen
-import com.vanard.ui.theme.VShopTheme
 
 @Composable
 fun VShopApp(
@@ -76,12 +74,6 @@ fun VShopApp(
                 )
             }
             composable(Screen.Cart.route) {
-                val context = LocalContext.current
-//                CartScreen(
-//                    onOrderButtonClicked = { message ->
-//                        shareOrder(context, message)
-//                    }
-//                )
                 CartScreen(
                     navigateBack = {
                         navController.navigateUp()
@@ -89,9 +81,11 @@ fun VShopApp(
                 )
             }
             composable(Screen.Profile.route) {
-//                ProfileScreen()
-//                ComingSoonScreen()
-                ErrorScreen()
+                ProfileScreen(
+                    navigateBack = {
+                        navController.navigateUp()
+                    },
+                )
             }
             composable(
                 route = Screen.Detail.route,
@@ -99,7 +93,6 @@ fun VShopApp(
             ) {
                 val id = it.arguments?.getLong("id") ?: -1L
                 Log.d(TAG, "detail: $id")
-//                ComingSoonScreen()
                 DetailScreen(
                     productId = id,
                     navigateBack = {
@@ -108,34 +101,12 @@ fun VShopApp(
                     navigateToCart = {
                         navController.popBackStack()
                         navController.navigateToSaveState(route = Screen.Cart.route)
-//                        navController.navigate(Screen.Cart.route) {
-//                            popUpTo(navController.graph.findStartDestination().id) {
-//                                saveState = true
-//                            }
-//                            launchSingleTop = true
-//                            restoreState = true
-//                        }
                     }
                 )
             }
         }
     }
 }
-
-//private fun shareOrder(context: Context, summary: String) {
-//    val intent = Intent(Intent.ACTION_SEND).apply {
-//        type = "text/plain"
-//        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.dicoding_reward))
-//        putExtra(Intent.EXTRA_TEXT, summary)
-//    }
-//
-//    context.startActivity(
-//        Intent.createChooser(
-//            intent,
-//            context.getString(R.string.dicoding_reward)
-//        )
-//    )
-//}
 
 @Composable
 private fun BottomBar(
