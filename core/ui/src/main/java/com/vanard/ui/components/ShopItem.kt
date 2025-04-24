@@ -23,14 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.vanard.common.util.toastMsg
 import com.vanard.domain.model.Product
 import com.vanard.domain.model.dummyProduct
@@ -58,25 +56,14 @@ fun ShopItemContent(
             .clickable(onClick = onSelectedProduct)
     ) {
         Box {
-            AsyncImage(
-                model = product.image,
-//                model = "https://ryusei.co.id/cdn/shop/articles/0bbcdd3148a2240345684a406e375e8f.jpg?v=1659525141&width=2048",
-                contentDescription = "Image Product",
-                contentScale = ContentScale.Crop,
-                modifier = modifier
+            ProductImage(
+                product.image,
+                modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(min = 100.dp, max = 200.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
-//            Image(
-//                painter = painterResource(R.drawable.product1),
-//                contentDescription = "Image Product",
-//                contentScale = ContentScale.Crop,
-//                modifier = modifier
-//                    .heightIn(max = 210.dp)
-//                    .fillMaxWidth()
-//                    .aspectRatio(0.7f)
-//                    .clip(RoundedCornerShape(16.dp))
-//            )
+
             IconButton(
                 onClick = {
                     onFavClick()
@@ -88,14 +75,8 @@ fun ShopItemContent(
                     .background(color = colorResource(R.color.paint_01))
                     .size(24.dp)
             ) {
-//                val iconHeart =
-//                    if (product.isFavorite) painterResource(R.drawable.heart_bold)
-//                    else painterResource(R.drawable.heart)
-
                 Icon(
                     painter = iconHeart,
-//                    painter = if (product.isFavorite) painterResource(R.drawable.heart_bold)
-//                    else painterResource(R.drawable.heart),
                     tint = colorResource(R.color.white),
                     contentDescription = null,
                     modifier = modifier.size(12.dp)
