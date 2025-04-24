@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -35,11 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanard.common.UIState
-import com.vanard.feature.ComingSoonScreen
 import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.FavoriteItemContent
 import com.vanard.ui.components.LoadingSingleTop
+import com.vanard.ui.components.RemoveMenuActions
 
 @Composable
 fun WishlistScreen(
@@ -88,9 +86,7 @@ fun WishlistScreen(
                             itemsIndexed(
                                 items = products.products,
                                 key = { index, _ -> index }) { index, product ->
-                                FavoriteItemContent(
-                                    product,
-                                    onSelectedProduct = {},
+                                val menuActions = RemoveMenuActions(
                                     onMenuClick = {
 //                                        expanded = true
                                         expandedIndex = index
@@ -105,6 +101,11 @@ fun WishlistScreen(
                                         viewModel.updateProductItem(product)
                                         Log.d(TAG, "onRemoveItem: ${expandedIndex == index}")
                                     }
+                                )
+                                FavoriteItemContent(
+                                    product,
+                                    onSelectedProduct = {},
+                                    actions = menuActions
                                 )
                             }
 
