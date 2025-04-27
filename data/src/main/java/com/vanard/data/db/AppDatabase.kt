@@ -1,6 +1,8 @@
 package com.vanard.data.db
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.vanard.data.dao.CartDao
 import com.vanard.data.dao.ProductDao
@@ -14,6 +16,13 @@ import com.vanard.data.entities.ProductEntity
 )
 
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun ProductDao(): ProductDao
-    abstract fun CartDao(): CartDao
+    companion object {
+        fun getInstance(context: Context) =
+            Room.databaseBuilder(context, AppDatabase::class.java, "shop_database.db")
+                .fallbackToDestructiveMigration(false)
+                .build()
+    }
+
+    abstract fun getProductDao(): ProductDao
+    abstract fun getCartDao(): CartDao
 }
