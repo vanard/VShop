@@ -1,12 +1,9 @@
 package com.vanard.domain.model
 
-import java.util.UUID
-
 data class ProductList(val products: List<Product>)
 
 data class Product(
     val id: Long,
-    val uuid: String = UUID.randomUUID().toString(),
     val title: String,
     val price: Double,
     val description: String,

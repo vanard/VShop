@@ -11,21 +11,17 @@ import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.ProductUseCase
 import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -87,18 +83,6 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
     val selectedCategory
         get() = _selectedCategory
 
-//    fun selectCategory(categories: Categories?) {
-//        _selectedCategory.value = categories
-//        _products.value = if (categories == null || categories == Categories.AllItems) {
-//            _ogProducts.value.copy()
-//        } else {
-//            _ogProducts.value.copy(
-//                products = _ogProducts.value.products.filter {
-//                    it.doestMatchQuery(categories.value)
-//                }
-//            )
-//        }
-//    }
 
     fun selectCategory(category: Categories?) {
         _selectedCategory.value = category
@@ -143,26 +127,20 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
         isLoaded = true
 
         viewModelScope.launch {
-//            _uiState.value = UIState.Loading
             setLoading()
-            val result = withContext(Dispatchers.IO) {
-                useCase.getAllProducts()
-            }
-            Log.d(TAG, "getProducts: $result")
             useCase.getAllProducts()
                 .collect { state ->
+                    Log.d(TAG, "getProducts state: $state")
                     when (state) {
                         is UIState.Success -> {
                             val products = ProductList(state.data)
-                            Log.d(TAG, "getProducts: $products")
+                            Log.d(TAG, "getProducts success: $products")
                             setProducts(products)
-//                            _uiState.value = UIState.Success(products)
                             setSuccess()
                         }
 
                         else -> {
                             Log.d(TAG, "getProducts: error")
-//                            _uiState.value = UIState.Error("BruH")
                             setError("Something went wrong")
                         }
                     }
@@ -179,15 +157,6 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
 
         _products.value = _products.value.copy(products = sorted)
     }
-
-//    fun pressFavorite(product: Product) {
-//        val newListValue = _products.value.copy(products = _products.value.products.map { item ->
-//            if (item.id == product.id) product else item
-//        })
-//
-//        setProducts(newListValue)
-//        updateProductItem(product)
-//    }
 
     fun updateProductItem(product: Product) {
         safeScope.launch {
