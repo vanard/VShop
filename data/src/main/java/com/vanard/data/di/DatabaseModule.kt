@@ -19,16 +19,12 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "shop_database.db"
-        ).build()
+        return AppDatabase.getInstance(context)
     }
 
     @Provides
-    fun provideProductDao(db: AppDatabase): ProductDao = db.ProductDao()
+    fun provideProductDao(db: AppDatabase): ProductDao = db.getProductDao()
 
     @Provides
-    fun provideCartDao(db: AppDatabase): CartDao = db.CartDao()
+    fun provideCartDao(db: AppDatabase): CartDao = db.getCartDao()
 }
