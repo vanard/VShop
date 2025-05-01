@@ -229,7 +229,7 @@ fun HomeScreen(
                                     },
                                     modifier = modifier.animateItem(
                                         tween(300)
-                                    )
+                                    ).testTag(product.title)
                                 )
                             }
                         }
