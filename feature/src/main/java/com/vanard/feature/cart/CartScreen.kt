@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanard.common.UIState
 import com.vanard.common.util.formalDecimal
 import com.vanard.common.util.toastMsg
@@ -55,10 +57,14 @@ private const val TAG = "CartScreen"
 
 @Composable
 fun CartScreen(
-    navigateBack: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = hiltViewModel()
 ) {
+    fun navigateBack() {
+        navController.navigateUp()
+    }
+
     viewModel.uiState.collectAsState().value.let { uiState ->
         when (uiState) {
             is UIState.Loading -> {
@@ -70,7 +76,7 @@ fun CartScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    HeaderCartScreen(navigateBack = navigateBack)
+                    HeaderCartScreen(navigateBack = ::navigateBack)
                     Spacer(modifier = Modifier.weight(1f))
                     FooterCartScreen(total = 0.0)
                 }
@@ -94,7 +100,7 @@ fun CartScreen(
                         .padding(horizontal = 16.dp)
                 ) {
                     //
-                    HeaderCartScreen(context, navigateBack)
+                    HeaderCartScreen(context, ::navigateBack)
 
                     LazyColumn(
                         state = scrollState,
@@ -303,7 +309,7 @@ private fun shareOrder(context: Context, summary: String) {
 fun CartScreenPreview(modifier: Modifier = Modifier) {
     VShopTheme {
 //        Scaffold(modifier = modifier.fillMaxSize()) { padding ->
-        CartScreen({})
+        CartScreen(rememberNavController())
 //        }
     }
 }

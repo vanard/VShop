@@ -40,6 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.vanard.common.Screen
 import com.vanard.common.UIState
 import com.vanard.common.util.firstWords
 import com.vanard.common.util.toastMsg
@@ -63,7 +66,7 @@ object HomeScreenTestTag {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    navigateToDetail: (Long) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -209,7 +212,11 @@ fun HomeScreen(
                                 ShopItemContent(
                                     product,
                                     onSelectedProduct = {
-                                        navigateToDetail(product.id)
+                                        navController.navigate(
+                                            route = Screen.Detail.detailRoute(
+                                                product.id
+                                            )
+                                        )
                                     },
                                     onFavClick = {
                                         val message = if (product.isFavorite)
@@ -275,7 +282,7 @@ fun HeaderHomeScreen(modifier: Modifier = Modifier) {
 fun HomeScreenPreview(modifier: Modifier = Modifier) {
     VShopTheme {
 //        Scaffold(modifier = modifier.fillMaxSize()) { padding ->
-        HomeScreen({})
+        HomeScreen(rememberNavController())
 //        }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.vanard.common.UIState
 import com.vanard.feature.ErrorScreen
 import com.vanard.resources.R
@@ -41,10 +42,14 @@ import com.vanard.ui.components.RemoveMenuActions
 
 @Composable
 fun WishlistScreen(
-    navigateBack: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: WishlistViewModel = hiltViewModel(),
 ) {
+    fun navigateBack() {
+        navController.navigateUp()
+    }
+
     viewModel.uiState.collectAsState().value.let { uiState ->
         when (uiState) {
             is UIState.Loading -> {
@@ -54,7 +59,7 @@ fun WishlistScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    HeaderWishlistScreen(navigateBack)
+                    HeaderWishlistScreen(::navigateBack)
                     LoadingSingleTop()
                 }
             }
@@ -75,7 +80,7 @@ fun WishlistScreen(
                         .padding(horizontal = 16.dp)
                 ) {
 
-                    HeaderWishlistScreen(navigateBack)
+                    HeaderWishlistScreen(::navigateBack)
 
                     LazyColumn(
                         state = scrollState,

@@ -36,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanard.common.UIState
 import com.vanard.common.util.firstWords
 import com.vanard.common.util.toastMsg
@@ -58,8 +60,7 @@ object DetailScreenTestTag {
 @Composable
 fun DetailScreen(
     productId: Long,
-    navigateBack: () -> Unit,
-//    navigateToCart: (Long) -> Unit,
+    navController: NavController,
     viewModel: DetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -105,7 +106,7 @@ fun DetailScreen(
 
                             IconButton(
                                 onClick = {
-                                    navigateBack()
+                                    navController.navigateUp()
                                 },
                                 modifier = Modifier
                                     .align(Alignment.TopStart)
@@ -241,6 +242,6 @@ fun DetailScreen(
 @Composable
 fun DetailScreenPreview() {
     VShopTheme {
-        DetailScreen(0, {})
+        DetailScreen(0, rememberNavController())
     }
 }
