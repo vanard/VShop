@@ -1,4 +1,4 @@
-package com.vanard.vshop.persentation
+package com.vanard.vshop.persentation.onboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,8 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanard.resources.R
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.vanard.common.Screen
 import com.vanard.common.util.toastMsg
+import com.vanard.resources.R
 import com.vanard.ui.theme.VShopTheme
 
 object OnboardScreenTestTag {
@@ -45,7 +48,7 @@ object OnboardScreenTestTag {
 }
 
 @Composable
-fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
+fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Box(
         modifier = modifier
@@ -107,7 +110,11 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
             Spacer(modifier = modifier.size(24.dp))
             Button(
                 onClick = {
-                    navigateToHome()
+                    navController.navigate(route = Screen.Home.route){
+                        popUpTo(Screen.Onboard.route) {
+                            inclusive = true
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
@@ -147,6 +154,6 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
 @Composable
 fun OnBoardPreview() {
     VShopTheme {
-        VShopApp()
+        OnboardScreen(rememberNavController())
     }
 }

@@ -8,20 +8,18 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vanard.common.Screen
 import com.vanard.feature.cart.CartScreen
 import com.vanard.feature.detail.DetailScreen
 import com.vanard.feature.home.HomeScreen
@@ -29,115 +27,61 @@ import com.vanard.feature.profile.ProfileScreen
 import com.vanard.feature.wishlist.WishlistScreen
 import com.vanard.resources.R
 import com.vanard.ui.theme.VShopTheme
-import com.vanard.vshop.navigation.Screen
 import com.vanard.vshop.navigation.getAllNavigationItem
+import com.vanard.vshop.persentation.onboard.OnboardScreen
 
 @Composable
 fun VShopApp(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val appState = rememberVShopState()
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != Screen.Detail.route && currentRoute != Screen.Onboard.route) {
-                BottomBar(navController)
+            if (appState.shouldShowBottomBar) {
+                VShopBottomBar(
+                    currentRoute = appState.currentRoute!!,
+                    navigateToRoute = appState::navigateToBottomBarRoute,
+                )
             }
         },
         modifier = modifier
     ) { innerPadding ->
+
         NavHost(
-            navController = navController,
+            navController = appState.navController,
             startDestination = Screen.Onboard.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Onboard.route) {
-                OnboardScreen(
-                    navigateToHome = navController.navigateTo(
-                        Screen.Home.route,
-                        Screen.Onboard.route
-                    )
-                )
-            }
-            composable(Screen.Home.route) {
-                HomeScreen(navigateToDetail = { productId ->
-                    navController.navigate(Screen.Detail.detailRoute(productId))
-                })
-            }
-            composable(Screen.Wishlist.route) {
-                WishlistScreen(
-                    navigateBack = {
-                        navController.navigateUp()
-                    },
-                )
-            }
-            composable(Screen.Cart.route) {
-                CartScreen(
-                    navigateBack = {
-                        navController.navigateUp()
-                    },
-                )
-            }
-            composable(Screen.Profile.route) {
-                ProfileScreen(
-                    navigateBack = {
-                        navController.navigateUp()
-                    },
-                )
-            }
-            composable(
-                route = Screen.Detail.route,
-                arguments = listOf(navArgument("id") { type = NavType.LongType }),
-            ) {
-                val id = it.arguments?.getLong("id") ?: -1L
-                Log.d(TAG, "detail: $id")
-                DetailScreen(
-                    productId = id,
-                    navigateBack = {
-                        navController.navigateUp()
-                    },
-                    navigateToCart = {
-                        navController.popBackStack()
-                        navController.navigateToSaveState(route = Screen.Cart.route)
-                    }
-                )
-            }
+            onboardScreen(appState.navController)
+            navigationScreens(appState.navController)
+            detailScreens(appState.navController)
         }
     }
 }
 
 @Composable
-private fun BottomBar(
-    navController: NavHostController,
+private fun VShopBottomBar(
+    currentRoute: String,
+    navigateToRoute: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
         containerColor = colorResource(R.color.paint_05),
         modifier = modifier,
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
         getAllNavigationItem().map { item ->
+            val selected = currentRoute == item.screen.route
             NavigationBarItem(
                 icon = {
                     Icon(
-                        painter = if (currentRoute == item.screen.route) item.selectedIcon else item.icon,
+                        painter = if (selected) item.selectedIcon else item.icon,
                         contentDescription = null
                     )
                 },
-                selected = currentRoute == item.screen.route,
+                selected = selected,
                 onClick = {
-                    if (currentRoute != item.screen.route)
-                        navController.navigate(item.screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            restoreState = true
-                            launchSingleTop = true
-                        }
+                   navigateToRoute(item.screen.route)
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = colorResource(R.color.paint_04),
@@ -149,7 +93,45 @@ private fun BottomBar(
     }
 }
 
-private fun NavController.navigateTo(route: String, from: String): () -> Unit = {
+private fun NavGraphBuilder.onboardScreen(navController: NavController) {
+    composable(route = Screen.Onboard.route) {
+        OnboardScreen(
+            navController = navController
+        )
+    }
+}
+
+private fun NavGraphBuilder.navigationScreens(navController: NavController) {
+    composable(Screen.Home.route) {
+        HomeScreen(navController = navController)
+    }
+    composable(Screen.Wishlist.route) {
+        WishlistScreen(navController = navController)
+    }
+    composable(Screen.Cart.route) {
+        CartScreen(navController = navController)
+    }
+    composable(Screen.Profile.route) {
+        ProfileScreen(navController = navController)
+    }
+}
+
+private fun NavGraphBuilder.detailScreens(navController: NavController) {
+    composable(
+        route = Screen.Detail.route,
+        arguments = listOf(navArgument("id") { type = NavType.LongType }),
+    ) {
+        val id = it.arguments?.getLong("id") ?: -1L
+        Log.d(TAG, "detail: $id")
+
+        DetailScreen(
+            productId = id,
+            navController = navController
+        )
+    }
+}
+
+fun NavController.navigateTo(route: String, from: String): () -> Unit = {
     this.navigate(route) {
         popUpTo(from) {
             inclusive = true
@@ -157,7 +139,7 @@ private fun NavController.navigateTo(route: String, from: String): () -> Unit = 
     }
 }
 
-private fun NavController.navigateToSaveState(route: String): () -> Unit = {
+fun NavController.navigateToSaveState(route: String): () -> Unit = {
     this.navigate(route) {
         popUpTo(this@navigateToSaveState.graph.findStartDestination().id) {
             saveState = true

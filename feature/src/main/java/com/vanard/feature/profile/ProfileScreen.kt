@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,18 +27,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanard.resources.R
 import com.vanard.ui.components.AvatarImage
 import com.vanard.ui.theme.VShopTheme
 
 @Composable
-fun ProfileScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier) {
+fun ProfileScreen(navController: NavController, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        HeaderProfileScreen(navigateBack)
+        HeaderProfileScreen({
+            navController.navigateUp()
+        })
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -67,6 +72,9 @@ fun ProfileScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
+            //TODO
+//            Spacer(Modifier.height(0.dp))
+//            LazyColumn {  }
 
         }
     }
@@ -111,6 +119,6 @@ fun HeaderProfileScreen(navigateBack: () -> Unit, modifier: Modifier = Modifier)
 @Composable
 fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     VShopTheme {
-        ProfileScreen({})
+        ProfileScreen(rememberNavController())
     }
 }
