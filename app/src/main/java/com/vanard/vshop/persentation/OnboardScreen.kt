@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,12 @@ import androidx.compose.ui.unit.sp
 import com.vanard.resources.R
 import com.vanard.common.util.toastMsg
 import com.vanard.ui.theme.VShopTheme
+
+object OnboardScreenTestTag {
+    const val ONBOARD_TEXT = "onboard_text"
+    const val LOGIN_BUTTON = "login_button"
+    const val GUEST_BUTTON = "guest_button"
+}
 
 @Composable
 fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
@@ -66,7 +73,8 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
             Text(
                 text = "Shop Instantly Just Enjoy Now!",
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.testTag(OnboardScreenTestTag.ONBOARD_TEXT)
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -83,6 +91,7 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
                     modifier = modifier
                         .weight(1f)
                         .padding(end = 8.dp)
+                        .testTag(OnboardScreenTestTag.LOGIN_BUTTON)
                 ) { Text("Login") }
                 Button(
                     onClick = {
@@ -103,7 +112,8 @@ fun OnboardScreen(modifier: Modifier = Modifier, navigateToHome: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
                 modifier = modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag(OnboardScreenTestTag.GUEST_BUTTON),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(

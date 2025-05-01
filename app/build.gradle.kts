@@ -17,7 +17,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.vanard.vshop.HiltRunner"
     }
 
     buildTypes {
@@ -42,6 +43,17 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.navigation.testing)
+    implementation(libs.androidx.runner)
+
+//    testImplementation(libs.hilt.testing)
+//    kaptTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
+
+//    testImplementation(libs.robolectric)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -72,8 +84,11 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
+    implementation(libs.bundles.room)
+
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
+    implementation(project(":core:resources"))
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":feature"))

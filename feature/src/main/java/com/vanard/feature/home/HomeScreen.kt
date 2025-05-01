@@ -1,5 +1,6 @@
 package com.vanard.feature.home
 
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +54,11 @@ import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.theme.VShopTheme
 import kotlinx.coroutines.launch
+
+object HomeScreenTestTag {
+    const val SEARCH = "search"
+    const val LAZY_LIST = "lazy_list"
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -153,6 +161,7 @@ fun HomeScreen(
                             onQueryChanged = viewModel::onSearchTextChange,
                             modifier = modifier
                                 .weight(1f)
+                                .testTag(HomeScreenTestTag.SEARCH)
                         )
                         IconButton(
                             onClick = {
@@ -192,6 +201,7 @@ fun HomeScreen(
                         contentPadding = PaddingValues(bottom = 16.dp),
                         verticalItemSpacing = 24.dp,
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        modifier = Modifier.testTag(HomeScreenTestTag.LAZY_LIST),
                         content = {
                             items(
                                 items = products.products,
@@ -199,7 +209,6 @@ fun HomeScreen(
                                 ShopItemContent(
                                     product,
                                     onSelectedProduct = {
-//                                        context.toastMsg("Product ${product.title}")
                                         navigateToDetail(product.id)
                                     },
                                     onFavClick = {
@@ -208,16 +217,11 @@ fun HomeScreen(
                                         else
                                             "${product.title.firstWords(2)} has been added to your favorites."
 
-//                                        viewModel::pressFavorite
-//                                        product.apply {
-//                                            product.copy(isFavorite = !this.isFavorite)
-//                                        }
-
                                         viewModel.updateProductItem(product)
                                         context.toastMsg(message)
                                     },
-                                    modifier = modifier.animateItemPlacement(
-                                        animationSpec = tween(300)
+                                    modifier = modifier.animateItem(
+                                        tween(300)
                                     )
                                 )
                             }
