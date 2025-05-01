@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,11 +48,18 @@ import com.vanard.ui.components.ProductImage
 import com.vanard.ui.theme.VShopTheme
 import com.vanard.ui.theme.Yellow
 
+object DetailScreenTestTag {
+    const val FAV = "favorite"
+    const val ADD_CART = "add_cart"
+    const val ARROW_BACK = "arrow_back"
+    const val READ_MORE = "read_more"
+}
+
 @Composable
 fun DetailScreen(
     productId: Long,
     navigateBack: () -> Unit,
-    navigateToCart: (Long) -> Unit,
+//    navigateToCart: (Long) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -105,6 +113,7 @@ fun DetailScreen(
                                     .clip(CircleShape)
                                     .background(color = colorResource(R.color.paint_04))
                                     .size(48.dp)
+                                    .testTag(DetailScreenTestTag.ARROW_BACK)
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.arrow_left_1),
@@ -130,6 +139,7 @@ fun DetailScreen(
                                     .clip(CircleShape)
                                     .background(color = colorResource(R.color.paint_04))
                                     .size(48.dp)
+                                    .testTag(DetailScreenTestTag.FAV)
                             ) {
                                 Icon(
                                     painter = if (product.isFavorite) painterResource(R.drawable.heart_bold)
@@ -193,6 +203,7 @@ fun DetailScreen(
                                 .weight(1f)
                                 .fillMaxWidth()
                                 .padding(top = 16.dp, bottom = 8.dp)
+                                .testTag(DetailScreenTestTag.READ_MORE)
                         )
 
                         HorizontalDivider(
@@ -207,7 +218,7 @@ fun DetailScreen(
                                 viewModel.addToCart(product)
                             },
                             colors = ButtonDefaults.buttonColors(colorResource(R.color.paint_01)),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().testTag(DetailScreenTestTag.ADD_CART)
                         ) {
                             Row(modifier = Modifier.padding(vertical = 16.dp)) {
                                 Icon(
@@ -230,6 +241,6 @@ fun DetailScreen(
 @Composable
 fun DetailScreenPreview() {
     VShopTheme {
-        DetailScreen(0, {}, {})
+        DetailScreen(0, {})
     }
 }
