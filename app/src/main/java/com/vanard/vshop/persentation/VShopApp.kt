@@ -32,9 +32,10 @@ import com.vanard.vshop.persentation.onboard.OnboardScreen
 
 @Composable
 fun VShopApp(
+    appState: VShopState = rememberVShopState(),
     modifier: Modifier = Modifier,
 ) {
-    val appState = rememberVShopState()
+//    val appState = rememberVShopState()
 
     Scaffold(
         bottomBar = {
