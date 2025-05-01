@@ -1,6 +1,5 @@
 package com.vanard.vshop.persentation
 
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -11,25 +10,17 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vanard.data.di.DatabaseModule
-import com.vanard.domain.usecase.ProductUseCase
+import com.vanard.data.di.RepositoryModule
 import com.vanard.feature.detail.DetailScreenTestTag
 import com.vanard.feature.home.HomeScreenTestTag
-import com.vanard.ui.theme.VShopTheme
-import com.vanard.vshop.navigation.Screen
-import com.vanard.vshop.repository.FakeFailureRepositoryImpl
-import com.vanard.vshop.repository.FakeFailureRepositoryImpl.Companion.errorMessage
-import com.vanard.vshop.repository.FakeSuccessRepositoryImpl
-import com.vanard.vshop.util.assertCurrentRouteName
+import com.vanard.vshop.persentation.onboard.OnboardScreenTestTag
 import com.vanard.vshop.util.fakeProductList
 import com.vanard.vshop.util.waitUntilTimeout
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +28,7 @@ import org.junit.runner.RunWith
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-@UninstallModules(DatabaseModule::class)
+@UninstallModules(RepositoryModule::class, DatabaseModule::class)
 class FeatureTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -49,29 +40,6 @@ class FeatureTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        fakeSuccessRepo = FakeSuccessRepositoryImpl()
-        fakeFailureRepo = FakeFailureRepositoryImpl()
-    }
-
-    private lateinit var navController: TestNavHostController
-
-    private lateinit var productUseCase: ProductUseCase
-
-    private lateinit var fakeSuccessRepo: FakeSuccessRepositoryImpl
-    private lateinit var fakeFailureRepo: FakeFailureRepositoryImpl
-
-    @After
-    fun tearDown() {
-        fakeSuccessRepo.reset()
-        fakeFailureRepo.reset()
-    }
-
-    private fun initSuccessUseCase() {
-        productUseCase = ProductUseCase(fakeSuccessRepo)
-    }
-
-    private fun initFailureUseCase() {
-        productUseCase = ProductUseCase(fakeFailureRepo)
     }
 
     private fun performGoToHome() {
@@ -87,69 +55,81 @@ class FeatureTest {
 
     @Test
     fun test_productListSuccess() {
-        initSuccessUseCase()
         performGoToHome()
         with(composeRule) {
             waitUntilTimeout(500)
             onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
             onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
-
+            waitUntilTimeout(1500)
             onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
             onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(0)
-                .assert(hasText(fakeProductList.first().title.plus(0)))
+                .assert(hasText(fakeProductList.first().title))
         }
     }
 
-//    @Test
-//    fun test_productListFailure() {
-//        initFailureUseCase()
-//        performGoToHome()
-//        with(composeRule) {
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
-//
-//            onNodeWithText(errorMessage).assertIsDisplayed()
-//        }
-//    }
-//
-//    @Test
-//    fun test_productListSuccess_productDetailsSuccess() {
-//        initSuccessUseCase()
-//        performGoToHome()
-//        with(composeRule) {
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
-//            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
-//            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(0)
-//                .assert(hasTestTag(fakeProductList.first().title.plus(0)))
-//            onNodeWithTag(fakeProductList.first().title.plus(0)).performClick()
-//            waitForIdle()
-//            onNodeWithText(fakeProductList.first().title).assertIsDisplayed()
-//
-//        }
-//
-//    }
-//
-//    @Test
-//    fun test_favorite() {
-//        initSuccessUseCase()
-//        performGoToHome()
-//        with(composeRule) {
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
-//            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("mens")
-//            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
-//            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(0)
-//                .assert(hasTestTag(fakeProductList.first().title.plus(0)))
-//            onNodeWithTag(fakeProductList.first().title.plus(0)).performClick()
-//
-//            onNodeWithTag(DetailScreenTestTag.FAV).performClick()
-//            onNodeWithText(DetailScreenTestTag.FAV).assertIsDisplayed()
-//            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).performClick()
-//            navController.assertCurrentRouteName(Screen.Wishlist.route)
-//            waitForIdle()
-//            onNodeWithText(fakeProductList.first().title).assertIsDisplayed()
-//        }
-//    }
+    @Test
+    fun test_productListSuccess_productDetailsSuccess() {
+        val productTest = fakeProductList[1]
+        performGoToHome()
+        with(composeRule) {
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
+            waitUntilTimeout(1500)
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(1)
+                .assert(hasTestTag(productTest.title))
+            onNodeWithTag(productTest.title).performClick()
+            waitForIdle()
+            onNodeWithText(productTest.title).assertIsDisplayed()
+            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).assertExists().performClick()
+
+        }
+
+    }
+
+    @Test
+    fun test_favorite() {
+        val productTest = fakeProductList[2]
+        performGoToHome()
+        with(composeRule) {
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
+            waitUntilTimeout(1500)
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(2)
+                .assert(hasTestTag(productTest.title))
+            onNodeWithTag(productTest.title).performClick()
+            waitUntilTimeout(1000)
+            onNodeWithTag(DetailScreenTestTag.FAV).assertIsDisplayed()
+            onNodeWithTag(DetailScreenTestTag.FAV).performClick()
+            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).assertIsDisplayed()
+            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).performClick()
+            waitForIdle()
+            onNodeWithTag(productTest.title).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun test_add_cart() {
+        val productTest = fakeProductList[3]
+        performGoToHome()
+        with(composeRule) {
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performClick()
+            onNodeWithTag(HomeScreenTestTag.SEARCH).performTextInput("product")
+            waitUntilTimeout(1500)
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).assertIsDisplayed()
+            onNodeWithTag(HomeScreenTestTag.LAZY_LIST).onChildAt(3)
+                .assert(hasTestTag(productTest.title))
+            onNodeWithTag(productTest.title).performClick()
+            waitUntilTimeout(1000)
+            onNodeWithTag(DetailScreenTestTag.ADD_CART).assertIsDisplayed()
+            onNodeWithTag(DetailScreenTestTag.ADD_CART).performClick()
+            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).assertIsDisplayed()
+            onNodeWithTag(DetailScreenTestTag.ARROW_BACK).performClick()
+            waitForIdle()
+            onNodeWithTag(productTest.title).assertIsDisplayed()
+        }
+    }
 
 
 }
