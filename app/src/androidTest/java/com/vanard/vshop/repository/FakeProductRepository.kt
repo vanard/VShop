@@ -7,8 +7,9 @@ import com.vanard.data.dao.ProductDao
 import com.vanard.data.mappers.toDomain
 import com.vanard.data.mappers.toEntity
 import com.vanard.domain.model.Product
-import com.vanard.domain.model.dummyProduct
 import com.vanard.domain.repository.ProductRepository
+import com.vanard.vshop.util.fakeProduct
+import com.vanard.vshop.util.fakeProductList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -25,7 +26,7 @@ class FakeProductRepository @Inject constructor(
                 productDao.getAllProducts().map { list -> list.map { it.toDomain() } }
             },
             fetch = {
-                listOf(dummyProduct)
+                fakeProductList
             },
             saveFetchResult = { dtoList ->
                 productDao.insertAllProduct(dtoList.map { it.toEntity() })
@@ -41,7 +42,7 @@ class FakeProductRepository @Inject constructor(
                 productDao.getProductById(id).map { product -> product?.toDomain() }
             },
             fetch = {
-                dummyProduct
+                fakeProductList.find { it.id == id } ?: fakeProduct
             },
             saveFetchResult = { productDto ->
                 productDao.insertProduct(productDto.toEntity())
@@ -53,7 +54,7 @@ class FakeProductRepository @Inject constructor(
 
     override suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>> =
         flow {
-            emit(UIState.Success(listOf(dummyProduct)))
+            emit(UIState.Success(fakeProductList))
         }
 
     override suspend fun getAllFavoriteProducts(): Flow<UIState<List<Product>>> {
