@@ -33,12 +33,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
     }
     buildFeatures {
         compose = true
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -71,6 +76,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     //splash api
     implementation(libs.splashscreen)
 
@@ -83,6 +90,8 @@ dependencies {
     //hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+
+    implementation(libs.hilt.navigation)
 
     implementation(libs.bundles.room)
 
