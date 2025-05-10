@@ -1,4 +1,4 @@
-package com.vanard.vshop.navigation
+package com.vanard.common
 
 sealed class Screen(val route: String) {
     object Onboard: Screen("onboard")
