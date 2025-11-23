@@ -2,7 +2,7 @@ package com.vanard.vshop.repository
 
 import com.vanard.common.UIState
 import com.vanard.common.util.networkBoundResourceUiState
-import com.vanard.core.common.asUiState
+import com.vanard.common.util.asUiState
 import com.vanard.data.dao.ProductDao
 import com.vanard.data.mappers.toDomain
 import com.vanard.data.mappers.toEntity

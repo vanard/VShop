@@ -1,8 +1,8 @@
 package com.vanard.data.repositoryImpl
 
 import com.vanard.common.UIState
-import com.vanard.core.common.fetchState
-import com.vanard.core.common.map
+import com.vanard.common.util.fetchState
+import com.vanard.common.util.map
 import com.vanard.data.dao.CartDao
 import com.vanard.data.mappers.toDomain
 import com.vanard.data.remote.CartService

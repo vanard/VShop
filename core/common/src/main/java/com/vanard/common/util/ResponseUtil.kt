@@ -1,4 +1,4 @@
-package com.vanard.core.common
+package com.vanard.common.util
 
 import com.google.gson.JsonSyntaxException
 import com.vanard.common.UIState
@@ -62,10 +62,12 @@ suspend fun <T> Response<T>.safeBodyOrThrow(): T {
 
 fun <T> Flow<T>.asUiState(): Flow<UIState<T>> =
     this
-        .map { data ->
+        .map<T, UIState<T>> { data ->
             UIState.Success(data)
-        }.catch {
-            UIState.Error("Something went wrong")
-        }.onStart {
-            UIState.Loading
+        }
+        .onStart {
+            emit(UIState.Loading)
+        }
+        .catch { e ->
+            emit(UIState.Error(e.message ?: "Something went wrong"))
         }
