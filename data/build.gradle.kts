@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
+    //datastore
+    implementation(libs.datastore)
+
     //chucker
     debugImplementation(libs.chucker.debug)
     releaseImplementation(libs.chucker.release)
