@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">VShop</string>
+    <string name="screen_onboard">onboard</string>
+    <string name="screen_home">home</string>
+    <string name="screen_wishlist">wishlist</string>
+    <string name="screen_cart">cart</string>
+    <string name="screen_profile">profile</string>
+    <string name="profile_name">Vian Rasyid D</string>
+    <string name="profile_email">vrddarknes@yahoo.com</string>
+</resources>
