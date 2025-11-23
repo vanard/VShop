@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -68,7 +69,7 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
                     RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp)
                 )
                 .background(color = colorResource(R.color.paint_04))
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(horizontal = 20.dp, vertical = 30.dp)
                 .align(Alignment.BottomEnd)
         ) {
             Text(text = "Quick Finds, Happy Times!", fontSize = 12.sp)
@@ -79,6 +80,7 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.testTag(OnboardScreenTestTag.ONBOARD_TEXT)
             )
+            Spacer(modifier = modifier.height(30.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = modifier
@@ -87,10 +89,10 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
             ) {
                 Button(
                     onClick = {
-                        context.toastMsg("Coming Soon!")
+                        navController.navigate(Screen.Login.route)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                    contentPadding = PaddingValues(vertical = 20.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp),
                     modifier = modifier
                         .weight(1f)
                         .padding(end = 8.dp)
@@ -98,16 +100,16 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
                 ) { Text("Login") }
                 Button(
                     onClick = {
-                        context.toastMsg("Coming Soon!")
+                        navController.navigate(Screen.SignUp.route)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                    contentPadding = PaddingValues(vertical = 20.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp),
                     modifier = modifier
                         .weight(1f)
                         .padding(start = 8.dp)
                 ) { Text("Sign Up") }
             }
-            Spacer(modifier = modifier.size(24.dp))
+            Spacer(modifier = modifier.size(20.dp))
             Button(
                 onClick = {
                     navController.navigate(route = Screen.Home.route){
@@ -117,7 +119,7 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                 modifier = modifier
                     .fillMaxWidth()
                     .testTag(OnboardScreenTestTag.GUEST_BUTTON),
@@ -143,7 +145,7 @@ fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
                 .padding(end = 16.dp)
                 .size(48.dp)
                 .align(Alignment.BottomEnd)
-                .offset(y = (-276).dp)
+                .offset(y = (-284).dp)
                 .alpha(0.7f)
 
         )

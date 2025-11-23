@@ -117,6 +117,8 @@ fun WishlistScreen(
                         })
                 }
             }
+
+            UIState.Idle -> TODO()
         }
 
     }

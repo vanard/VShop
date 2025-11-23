@@ -8,8 +8,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -20,6 +25,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vanard.common.Screen
+import com.vanard.feature.auth.LoginScreen
+import com.vanard.feature.auth.SignUpScreen
 import com.vanard.feature.cart.CartScreen
 import com.vanard.feature.detail.DetailScreen
 import com.vanard.feature.home.HomeScreen
@@ -35,7 +42,13 @@ fun VShopApp(
     appState: VShopState = rememberVShopState(),
     modifier: Modifier = Modifier,
 ) {
-//    val appState = rememberVShopState()
+    // Check authentication status to determine start destination
+    var startDestination by remember { mutableStateOf(Screen.Onboard.route) }
+    val context = LocalContext.current
+    
+    // You can add logic here to check if user is logged in
+    // For now, we'll start with onboard as default
+    // TODO
 
     Scaffold(
         bottomBar = {
@@ -51,10 +64,11 @@ fun VShopApp(
 
         NavHost(
             navController = appState.navController,
-            startDestination = Screen.Onboard.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             onboardScreen(appState.navController)
+            authScreens(appState.navController)
             navigationScreens(appState.navController)
             detailScreens(appState.navController)
         }
@@ -99,6 +113,15 @@ private fun NavGraphBuilder.onboardScreen(navController: NavController) {
         OnboardScreen(
             navController = navController
         )
+    }
+}
+
+private fun NavGraphBuilder.authScreens(navController: NavController) {
+    composable(route = Screen.Login.route) {
+        LoginScreen(navController = navController)
+    }
+    composable(route = Screen.SignUp.route) {
+        SignUpScreen(navController = navController)
     }
 }
 

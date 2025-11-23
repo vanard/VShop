@@ -49,6 +49,7 @@ inline fun <T, R> UIState<T>.map(transform: (T) -> R): UIState<R> = when (this) 
     is UIState.Success -> UIState.Success(transform(data))
     is UIState.Error -> this
     is UIState.Loading -> this
+    is UIState.Idle -> this
 }
 
 suspend fun <T> Response<T>.safeBodyOrThrow(): T {
