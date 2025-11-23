@@ -1,4 +1,4 @@
-package com.vanard.domain.usecase
+package com.vanard.domain.usecase.product
 
 import com.vanard.common.UIState
 import com.vanard.domain.model.Product
@@ -19,8 +19,17 @@ class ProductUseCase(private val productRepository: ProductRepository) {
         return productRepository.getProductById(id)
     }
 
+    suspend fun getProductsByCategory(category: String): Flow<UIState<List<Product>>> {
+        return productRepository.getProductsByCategory(category)
+    }
+
     suspend fun updateProduct(product: Product) {
         productRepository.updateProduct(product)
+    }
+
+    suspend fun toggleFavorite(product: Product) {
+        val updatedProduct = product.copy(isFavorite = !product.isFavorite)
+        productRepository.updateProduct(updatedProduct)
     }
 
     suspend fun getAllLocalCarts(): Flow<UIState<List<Product>>> {

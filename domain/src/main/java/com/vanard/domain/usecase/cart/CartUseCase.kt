@@ -1,4 +1,4 @@
-package com.vanard.domain.usecase
+package com.vanard.domain.usecase.cart
 
 import com.vanard.common.UIState
 import com.vanard.domain.model.Cart

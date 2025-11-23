@@ -168,6 +168,8 @@ fun CartScreen(
             is UIState.Error -> {
                 ErrorScreen()
             }
+
+            UIState.Idle -> TODO()
         }
     }
 }

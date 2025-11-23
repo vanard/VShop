@@ -3,7 +3,7 @@ package com.vanard.feature.cart
 import android.util.Log
 import com.vanard.common.UIState
 import com.vanard.domain.model.Product
-import com.vanard.domain.usecase.ProductUseCase
+import com.vanard.domain.usecase.product.ProductUseCase
 import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
