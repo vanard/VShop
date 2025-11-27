@@ -33,3 +33,10 @@ google-services.json
 # Android Profiling
 *.hprof
 /documentation/
+/.kotlin/sessions/
+/gradle/wrapper/gradle-wrapper.jar
+/buildSrc/build.gradle.kts
+/gradle.properties
+/gradle/wrapper/gradle-wrapper.properties
+/buildSrc/src/main/kotlin/plug/Plug.kt
+/core/ui/src/main/java/com/vanard/ui/base/UsageExamples.kt
