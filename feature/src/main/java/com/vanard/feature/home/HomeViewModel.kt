@@ -123,8 +123,8 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
     }
 
     fun getProducts() {
-        if (isLoaded) return
-        isLoaded = true
+//        if (isLoaded) return
+//        isLoaded = true
 
         viewModelScope.launch {
             setLoading()

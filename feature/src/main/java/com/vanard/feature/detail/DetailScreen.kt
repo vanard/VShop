@@ -235,7 +235,7 @@ fun DetailScreen(
 
             }
 
-            UIState.Idle -> TODO()
+            UIState.Idle -> {}
         }
     }
 }

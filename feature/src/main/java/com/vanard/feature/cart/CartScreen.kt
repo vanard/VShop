@@ -169,7 +169,7 @@ fun CartScreen(
                 ErrorScreen()
             }
 
-            UIState.Idle -> TODO()
+            UIState.Idle -> {}
         }
     }
 }
