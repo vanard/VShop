@@ -12,19 +12,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,9 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +51,10 @@ import com.vanard.common.Screen
 import com.vanard.common.UIState
 import com.vanard.common.util.toastMsg
 import com.vanard.resources.R
+import com.vanard.ui.components.SignUpFormEmailField
+import com.vanard.ui.components.SignUpFormPasswordField
+import com.vanard.ui.components.SignUpFormPhoneField
+import com.vanard.ui.components.SignUpFormTextField
 import com.vanard.ui.theme.VShopTheme
 
 @Composable
@@ -101,7 +101,7 @@ fun SignUpScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Logo
         Image(
@@ -110,7 +110,7 @@ fun SignUpScreen(
             modifier = Modifier.size(100.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Welcome Text
         Text(
@@ -144,193 +144,68 @@ fun SignUpScreen(
                 modifier = Modifier.padding(24.dp)
             ) {
                 // First Name Field
-                OutlinedTextField(
+                SignUpFormTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("First Name", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.profile),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    label = "First Name",
+                    leadingIcon = painterResource(R.drawable.profile),
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Last Name Field
-                OutlinedTextField(
+                SignUpFormTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Last Name", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.profile),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    label = "Last Name",
+                    leadingIcon = painterResource(R.drawable.profile),
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Email Field
-                OutlinedTextField(
+                SignUpFormEmailField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_email),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Phone Field (Optional)
-                OutlinedTextField(
+                SignUpFormPhoneField(
                     value = phone,
                     onValueChange = { phone = it },
-                    label = { Text("Phone (Optional)", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_phone),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    label = "Phone (Optional)",
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Password Field
-                OutlinedTextField(
+                SignUpFormPasswordField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_lock),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    if (passwordVisible) R.drawable.ic_visibility_off
-                                    else R.drawable.ic_visibility
-                                ),
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                                tint = colorResource(R.color.paint_02)
-                            )
-                        }
-                    },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    label = "Password",
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Confirm Password Field
-                OutlinedTextField(
+                SignUpFormPasswordField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password", color = colorResource(R.color.paint_02)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_lock),
-                            contentDescription = null,
-                            tint = colorResource(R.color.paint_02)
-                        )
+                    label = "Confirm Password",
+                    passwordVisible = confirmPasswordVisible,
+                    onPasswordVisibilityToggle = {
+                        confirmPasswordVisible = !confirmPasswordVisible
                     },
-                    trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    if (confirmPasswordVisible) R.drawable.ic_visibility_off
-                                    else R.drawable.ic_visibility
-                                ),
-                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                                tint = colorResource(R.color.paint_02)
-                            )
-                        }
-                    },
-                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.paint_01),
-                        unfocusedBorderColor = colorResource(R.color.paint_03),
-                        focusedLabelColor = colorResource(R.color.paint_01),
-                        unfocusedLabelColor = colorResource(R.color.paint_02),
-                        cursorColor = colorResource(R.color.paint_01),
-                        focusedTextColor = colorResource(R.color.paint_05),
-                        unfocusedTextColor = colorResource(R.color.paint_05)
-                    )
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -417,6 +292,11 @@ fun SignUpScreen(
                 navController.popBackStack()
             }
         ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back Icon"
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Back",
                 color = colorResource(R.color.paint_02)
