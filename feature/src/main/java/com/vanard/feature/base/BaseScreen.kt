@@ -1,5 +1,6 @@
 package com.vanard.feature.base
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,6 +50,9 @@ fun BaseScreen(
     val sessionState by sessionViewModel.sessionState.collectAsState()
     val userState by sessionViewModel.userState.collectAsState()
 
+    Log.d("BaseScreen", "BaseScreen sessionState: $sessionState")
+    Log.d("BaseScreen", "BaseScreen userState: $userState")
+
     // Handle session state changes
     LaunchedEffect(sessionState) {
         when (sessionState) {
@@ -76,6 +80,8 @@ fun BaseScreen(
                     )
                 }
             }
+
+            is SessionState.Authenticated -> navController.isAuthorized()
 
             else -> { /* Continue with normal flow */
             }
@@ -136,6 +142,9 @@ fun BaseScreen(
                 is UIState.Success -> state.data
                 else -> null
             }
+
+            Log.d("BaseScreen", "BaseScreen: $currentUser")
+
             content(currentUser)
         }
     }
@@ -150,80 +159,25 @@ private fun NavController.unauthorized(requireAuth: Boolean, redirectToOnboard: 
             if (redirectToOnboard) Screen.Onboard.route else Screen.Login.route
 
         // Only navigate if we're not already at the destination
-        if (currentDestination?.route != destination) {
-            this.navigate(destination) {
-                popUpTo(0) { inclusive = true }
-            }
-        }
+        navigateToDestination(destination)
     }
 }
 
-/**
- * Composable that provides user data without navigation handling
- * Useful for screens that just need user data but don't require authentication
- */
-@Composable
-fun WithUserData(
-    sessionViewModel: SessionViewModel = hiltViewModel(),
-    content: @Composable (user: User?, isLoading: Boolean) -> Unit
-) {
-    val userState by sessionViewModel.userState.collectAsState()
-    val sessionState by sessionViewModel.sessionState.collectAsState()
+private fun NavController.isAuthorized() {
+    val destination = Screen.Home.route
+    navigateToDestination(destination)
 
-    val currentUser = when (val state = userState) {
-        is UIState.Success -> state.data
-        else -> null
-    }
-
-    val isLoading = sessionState is SessionState.Loading
-
-    content(currentUser, isLoading)
+//    if (currentDestination?.route != destination) {
+//        this.navigate(destination) {
+//            popUpTo(0) { inclusive = true }
+//        }
+//    }
 }
 
-/**
- * Composable that provides authenticated user data
- * Similar to WithUserData but specifically for authenticated users
- */
-@Composable
-fun WithAuthenticatedUser(
-    sessionViewModel: SessionViewModel = hiltViewModel(),
-    onNotAuthenticated: () -> Unit = {},
-    content: @Composable (user: User) -> Unit
-) {
-    val userState by sessionViewModel.userState.collectAsState()
-    val sessionState by sessionViewModel.sessionState.collectAsState()
-
-    LaunchedEffect(sessionState) {
-        if (sessionState is SessionState.NotAuthenticated ||
-            sessionState is SessionState.SessionExpired
-        ) {
-            onNotAuthenticated()
-        }
-    }
-
-    when (val state = userState) {
-        is UIState.Success -> {
-            state.data?.let { user ->
-                content(user)
-            } ?: run {
-                onNotAuthenticated()
-            }
-        }
-
-        is UIState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = colorResource(R.color.paint_01)
-                )
-            }
-        }
-
-        else -> {
-            // Error or idle state
-            onNotAuthenticated()
+private fun NavController.navigateToDestination(destination: String) {
+    if (currentDestination?.route != destination) {
+        this.navigate(destination) {
+            popUpTo(0) { inclusive = true }
         }
     }
 }
