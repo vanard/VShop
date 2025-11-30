@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanard.common.Screen
 import com.vanard.common.util.toastMsg
+import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
 import com.vanard.ui.theme.VShopTheme
 
@@ -50,106 +51,113 @@ object OnboardScreenTestTag {
 
 @Composable
 fun OnboardScreen(navController: NavController, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        val painterRs = painterResource(R.drawable.product1)
-        Image(
-            painter = painterRs,
-            contentDescription = "Onboard Image",
-            contentScale = ContentScale.FillWidth,
-            modifier = modifier.fillMaxWidth(),
-        )
-        Column(
+    BaseScreen(
+        navController = navController,
+        requireAuth = false,
+        showLoading = false
+    ) { user ->
+//    val context = LocalContext.current
+        Box(
             modifier = modifier
-                .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp)
-                )
-                .background(color = colorResource(R.color.paint_04))
-                .padding(horizontal = 20.dp, vertical = 30.dp)
-                .align(Alignment.BottomEnd)
+                .fillMaxSize()
         ) {
-            Text(text = "Quick Finds, Happy Times!", fontSize = 12.sp)
-            Spacer(modifier = modifier.size(4.dp))
-            Text(
-                text = "Shop Instantly Just Enjoy Now!",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.testTag(OnboardScreenTestTag.ONBOARD_TEXT)
+            val painterRs = painterResource(R.drawable.product1)
+            Image(
+                painter = painterRs,
+                contentDescription = "Onboard Image",
+                contentScale = ContentScale.FillWidth,
+                modifier = modifier.fillMaxWidth(),
             )
-            Spacer(modifier = modifier.height(30.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = modifier
-                    .padding(top = 28.dp)
-                    .fillMaxWidth()
-            ) {
-                Button(
-                    onClick = {
-                        navController.navigate(Screen.Login.route)
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    modifier = modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .testTag(OnboardScreenTestTag.LOGIN_BUTTON)
-                ) { Text("Login") }
-                Button(
-                    onClick = {
-                        navController.navigate(Screen.SignUp.route)
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    modifier = modifier
-                        .weight(1f)
-                        .padding(start = 8.dp)
-                ) { Text("Sign Up") }
-            }
-            Spacer(modifier = modifier.size(20.dp))
-            Button(
-                onClick = {
-                    navController.navigate(route = Screen.Home.route){
-                        popUpTo(Screen.Onboard.route) {
-                            inclusive = true
-                        }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .testTag(OnboardScreenTestTag.GUEST_BUTTON),
-                shape = RoundedCornerShape(16.dp)
+                    .clip(
+                        RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp)
+                    )
+                    .background(color = colorResource(R.color.paint_04))
+                    .padding(horizontal = 20.dp, vertical = 30.dp)
+                    .align(Alignment.BottomEnd)
             ) {
+                Text(text = "Quick Finds, Happy Times!", fontSize = 12.sp)
+                Spacer(modifier = modifier.size(4.dp))
                 Text(
-                    text = "Continue as Guest",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Left,
-                    modifier = modifier.weight(1f)
+                    text = "Shop Instantly Just Enjoy Now!",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag(OnboardScreenTestTag.ONBOARD_TEXT)
                 )
-                Icon(
-                    painter = painterResource(R.drawable.arrow_right_1),
-                    tint = Color.White,
-                    contentDescription = null,
-                )
+                Spacer(modifier = modifier.height(30.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = modifier
+                        .padding(top = 28.dp)
+                        .fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.Login.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        modifier = modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .testTag(OnboardScreenTestTag.LOGIN_BUTTON)
+                    ) { Text("Login") }
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.SignUp.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        modifier = modifier
+                            .weight(1f)
+                            .padding(start = 8.dp)
+                    ) { Text("Sign Up") }
+                }
+                Spacer(modifier = modifier.size(20.dp))
+                Button(
+                    onClick = {
+                        navController.navigate(route = Screen.Home.route){
+                            popUpTo(Screen.Onboard.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.paint_01)),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .testTag(OnboardScreenTestTag.GUEST_BUTTON),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = "Continue as Guest",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.weight(1f)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.arrow_right_1),
+                        tint = Color.White,
+                        contentDescription = null,
+                    )
+                }
             }
-        }
-        Image(
-            painter = painterResource(R.drawable.vshop_logo),
-            contentDescription = "Onboard Image",
-            modifier = modifier
-                .padding(end = 16.dp)
-                .size(48.dp)
-                .align(Alignment.BottomEnd)
-                .offset(y = (-284).dp)
-                .alpha(0.7f)
+            Image(
+                painter = painterResource(R.drawable.vshop_logo),
+                contentDescription = "Onboard Image",
+                modifier = modifier
+                    .padding(end = 16.dp)
+                    .size(48.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(y = (-284).dp)
+                    .alpha(0.7f)
 
-        )
+            )
+        }
     }
+
 }
 
 @Preview(showBackground = true)

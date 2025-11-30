@@ -1,6 +1,5 @@
 package com.vanard.feature.home
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -10,17 +9,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells.Fixed
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,9 +49,11 @@ import com.vanard.common.Screen
 import com.vanard.common.UIState
 import com.vanard.common.util.firstWords
 import com.vanard.common.util.toastMsg
+import com.vanard.domain.model.User
 import com.vanard.domain.model.getAllCategories
 import com.vanard.domain.model.getCategories
 import com.vanard.feature.ErrorScreen
+import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
 import com.vanard.ui.components.AvatarImage
 import com.vanard.ui.components.ChipGroup
@@ -70,17 +75,67 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-//    viewModel.uiState.collectAsState(initial = UIState.Loading).value.let { uiState ->
-    viewModel.uiState.collectAsState().value.let { uiState ->
+    // Use BaseScreen to provide optional user data
+    BaseScreen(
+        navController = navController,
+        requireAuth = false, // Don't require auth, but provide user data if available
+        showLoading = false // Don't show loading for home screen
+    ) { user ->
+        HomeContent(
+            navController = navController,
+            user = user, // This will be null if not authenticated
+            viewModel = viewModel,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun HomeContent(
+    navController: NavController,
+    user: User?,
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val products by viewModel.products.collectAsState()
+    val searchText by viewModel.searchText.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+    val selectedCategory = viewModel.selectedCategory.value
+    
+    LaunchedEffect(Unit) {
+        viewModel.getProducts()
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+    ) {
+        // Header with user greeting (if authenticated)
+        if (user != null && user.id.isNotEmpty()) {
+            HomeHeaderLogin()
+        } else {
+            HomeHeaderGuest(
+                user = user,
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
+                onLoginClick = { navController.navigate(Screen.Login.route) }
+            )
+        }
+        
+        // Rest of your existing home screen content...
+        // SearchBar, Categories, Products, etc.
+        
+        // Your existing HomeScreen content here
         when (uiState) {
             is UIState.Loading -> {
                 viewModel.getProducts()
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 20.dp)
-                ) {
-                    HeaderHomeScreen()
+//                Column(
+//                    modifier = modifier
+//                        .fillMaxSize()
+//                        .padding(horizontal = 20.dp)
+//                ) {
+//                    HomeHeaderLogin()
 
                     Spacer(Modifier.size(16.dp))
 
@@ -117,7 +172,7 @@ fun HomeScreen(
                     )
 
                     LoadingSingleTop()
-                }
+//                }
             }
 
             is UIState.Success -> {
@@ -126,17 +181,9 @@ fun HomeScreen(
                 val scrollState = rememberLazyListState()
                 val scrollGridState = rememberLazyStaggeredGridState()
 
-                val searchText by viewModel.searchText.collectAsState()
                 val products by viewModel.products.collectAsState()
+                val searchText by viewModel.searchText.collectAsState()
                 val isSearching by viewModel.isSearching.collectAsState()
-
-//                LaunchedEffect(products) {
-//                    println("Products updated: ${products.products.map { it.isFavorite }}")
-//                    Log.d(
-//                        "HomeScreen",
-//                        "Products updated: ${products.products.map { it.isFavorite }}"
-//                    )
-//                }
 
                 fun scrollToTop() {
                     coroutineScope.launch {
@@ -146,12 +193,12 @@ fun HomeScreen(
                     }
                 }
 
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 20.dp)
-                ) {
-                    HeaderHomeScreen()
+//                Column(
+//                    modifier = modifier
+//                        .fillMaxSize()
+//                        .padding(horizontal = 20.dp)
+//                ) {
+//                    HomeHeaderLogin()
 
                     Spacer(Modifier.size(16.dp))
 
@@ -200,7 +247,7 @@ fun HomeScreen(
 
                     LazyVerticalStaggeredGrid(
                         state = scrollGridState,
-                        columns = StaggeredGridCells.Fixed(2),
+                        columns = Fixed(2),
                         contentPadding = PaddingValues(bottom = 16.dp),
                         verticalItemSpacing = 24.dp,
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -227,25 +274,87 @@ fun HomeScreen(
                                         viewModel.updateProductItem(product)
                                         context.toastMsg(message)
                                     },
-                                    modifier = modifier.animateItem(
-                                        tween(300)
-                                    ).testTag(product.title)
+                                    modifier = modifier
+                                        .animateItem(
+                                            tween(300)
+                                        )
+                                        .testTag(product.title)
                                 )
                             }
                         }
                     )
-                }
+//                }
             }
 
             is UIState.Error -> {
                 ErrorScreen()
+            }
+
+            UIState.Idle -> {}
+        }
+    }
+}
+
+@Composable
+private fun HomeHeaderGuest(
+    user: User?,
+    onProfileClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.paint_04)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = if (user != null) "Hello, ${user.firstName}!" else "Welcome, Guest!",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.paint_01)
+                )
+                Text(
+                    text = if (user != null) "Ready to shop?" else "Sign in for personalized experience",
+                    fontSize = 14.sp,
+                    color = colorResource(R.color.paint_02)
+                )
+            }
+            
+            if (user != null) {
+                IconButton(onClick = onProfileClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.profile),
+                        contentDescription = "Profile",
+                        tint = colorResource(R.color.paint_01)
+                    )
+                }
+            } else {
+                TextButton(onClick = onLoginClick) {
+                    Text(
+                        text = "Sign In",
+                        color = colorResource(R.color.paint_01),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun HeaderHomeScreen(modifier: Modifier = Modifier) {
+fun HomeHeaderLogin(modifier: Modifier = Modifier) {
     Row(modifier = modifier.padding(top = 20.dp)) {
         Column(
             modifier = modifier
