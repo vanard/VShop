@@ -98,11 +98,11 @@ private fun HomeContent(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val products by viewModel.products.collectAsState()
-    val searchText by viewModel.searchText.collectAsState()
-    val isSearching by viewModel.isSearching.collectAsState()
-    val selectedCategory = viewModel.selectedCategory.value
-    
+//    val products by viewModel.products.collectAsState()
+//    val searchText by viewModel.searchText.collectAsState()
+//    val isSearching by viewModel.isSearching.collectAsState()
+//    val selectedCategory = viewModel.selectedCategory.value
+
     LaunchedEffect(Unit) {
         viewModel.getProducts()
     }
@@ -122,56 +122,49 @@ private fun HomeContent(
                 onLoginClick = { navController.navigate(Screen.Login.route) }
             )
         }
-        
+
         // Rest of your existing home screen content...
         // SearchBar, Categories, Products, etc.
-        
+
         // Your existing HomeScreen content here
         when (uiState) {
             is UIState.Loading -> {
-                viewModel.getProducts()
-//                Column(
-//                    modifier = modifier
-//                        .fillMaxSize()
-//                        .padding(horizontal = 20.dp)
-//                ) {
-//                    HomeHeaderLogin()
+//                viewModel.getProducts()
+                Spacer(Modifier.size(16.dp))
 
-                    Spacer(Modifier.size(16.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                ) {
+                    CustomSearchBar(
+                        query = "",
+                        onQueryChanged = viewModel::onSearchTextChange,
                         modifier = modifier
-                    ) {
-                        CustomSearchBar(
-                            query = "",
-                            onQueryChanged = viewModel::onSearchTextChange,
-                            modifier = modifier
-                                .weight(1f)
-                        )
-                        IconButton(
-                            onClick = {},
-                            modifier = modifier
-                                .padding(start = 16.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(color = colorResource(R.color.paint_01))
-                                .size(56.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.setting_4),
-                                tint = Color.White,
-                                contentDescription = "Icon"
-                            )
-                        }
-                    }
-
-                    ChipGroup(
-                        categories = getAllCategories(),
-                        selectedCategories = viewModel.selectedCategory.value,
-                        onSelectedChanged = {}
+                            .weight(1f)
                     )
+                    IconButton(
+                        onClick = {},
+                        modifier = modifier
+                            .padding(start = 16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = colorResource(R.color.paint_01))
+                            .size(56.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.setting_4),
+                            tint = Color.White,
+                            contentDescription = "Icon"
+                        )
+                    }
+                }
 
-                    LoadingSingleTop()
+                ChipGroup(
+                    categories = getAllCategories(),
+                    selectedCategories = viewModel.selectedCategory.value,
+                    onSelectedChanged = {}
+                )
+
+                LoadingSingleTop()
 //                }
             }
 
@@ -193,96 +186,89 @@ private fun HomeContent(
                     }
                 }
 
-//                Column(
-//                    modifier = modifier
-//                        .fillMaxSize()
-//                        .padding(horizontal = 20.dp)
-//                ) {
-//                    HomeHeaderLogin()
+                Spacer(Modifier.size(16.dp))
 
-                    Spacer(Modifier.size(16.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                ) {
+                    CustomSearchBar(
+                        query = searchText,
+                        onQueryChanged = viewModel::onSearchTextChange,
                         modifier = modifier
+                            .weight(1f)
+                            .testTag(HomeScreenTestTag.SEARCH)
+                    )
+                    IconButton(
+                        onClick = {
+                            viewModel.sortProducts()
+                            scrollToTop()
+                        },
+                        modifier = modifier
+                            .padding(start = 16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = colorResource(R.color.paint_01))
+                            .size(56.dp)
                     ) {
-                        CustomSearchBar(
-                            query = searchText,
-                            onQueryChanged = viewModel::onSearchTextChange,
-                            modifier = modifier
-                                .weight(1f)
-                                .testTag(HomeScreenTestTag.SEARCH)
+                        Icon(
+                            painter = painterResource(R.drawable.setting_4),
+                            tint = Color.White,
+                            contentDescription = null
                         )
-                        IconButton(
-                            onClick = {
-                                viewModel.sortProducts()
-                                scrollToTop()
-                            },
-                            modifier = modifier
-                                .padding(start = 16.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(color = colorResource(R.color.paint_01))
-                                .size(56.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.setting_4),
-                                tint = Color.White,
-                                contentDescription = null
+                    }
+                }
+
+                ChipGroup(
+                    state = scrollState,
+                    categories = getAllCategories(),
+                    selectedCategories = viewModel.selectedCategory.value,
+                    onSelectedChanged = {
+                        viewModel.selectCategory(getCategories(it))
+                        scrollToTop()
+                    })
+
+                if (isSearching) {
+                    LoadingSingleTop()
+                }
+
+                LazyVerticalStaggeredGrid(
+                    state = scrollGridState,
+                    columns = Fixed(2),
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    verticalItemSpacing = 24.dp,
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier.testTag(HomeScreenTestTag.LAZY_LIST),
+                    content = {
+                        items(
+                            items = products.products,
+                            key = { it.id }) { product ->
+                            ShopItemContent(
+                                product,
+                                onSelectedProduct = {
+                                    navController.navigate(
+                                        route = Screen.Detail.detailRoute(
+                                            product.id
+                                        )
+                                    )
+                                },
+                                onFavClick = {
+                                    val message = if (product.isFavorite)
+                                        "${product.title.firstWords(2)} has been removed from your favorites."
+                                    else
+                                        "${product.title.firstWords(2)} has been added to your favorites."
+
+                                    viewModel.updateProductItem(product)
+                                    context.toastMsg(message)
+                                },
+                                modifier = modifier
+                                    .animateItem(
+                                        tween(300)
+                                    )
+                                    .testTag(product.title)
                             )
                         }
                     }
-
-                    ChipGroup(
-                        state = scrollState,
-                        categories = getAllCategories(),
-                        selectedCategories = viewModel.selectedCategory.value,
-                        onSelectedChanged = {
-                            viewModel.selectCategory(getCategories(it))
-                            scrollToTop()
-                        })
-
-                    if (isSearching) {
-                        LoadingSingleTop()
-                    }
-
-                    LazyVerticalStaggeredGrid(
-                        state = scrollGridState,
-                        columns = Fixed(2),
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalItemSpacing = 24.dp,
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
-                        modifier = Modifier.testTag(HomeScreenTestTag.LAZY_LIST),
-                        content = {
-                            items(
-                                items = products.products,
-                                key = { it.id }) { product ->
-                                ShopItemContent(
-                                    product,
-                                    onSelectedProduct = {
-                                        navController.navigate(
-                                            route = Screen.Detail.detailRoute(
-                                                product.id
-                                            )
-                                        )
-                                    },
-                                    onFavClick = {
-                                        val message = if (product.isFavorite)
-                                            "${product.title.firstWords(2)} has been removed from your favorites."
-                                        else
-                                            "${product.title.firstWords(2)} has been added to your favorites."
-
-                                        viewModel.updateProductItem(product)
-                                        context.toastMsg(message)
-                                    },
-                                    modifier = modifier
-                                        .animateItem(
-                                            tween(300)
-                                        )
-                                        .testTag(product.title)
-                                )
-                            }
-                        }
-                    )
+                )
 //                }
             }
 
@@ -331,7 +317,7 @@ private fun HomeHeaderGuest(
                     color = colorResource(R.color.paint_02)
                 )
             }
-            
+
             if (user != null) {
                 IconButton(onClick = onProfileClick) {
                     Icon(

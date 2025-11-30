@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +47,9 @@ import com.vanard.common.util.formalDecimal
 import com.vanard.common.util.toastMsg
 import com.vanard.domain.model.Product
 import com.vanard.feature.ErrorScreen
+import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
+import com.vanard.ui.base.navigateBack
 import com.vanard.ui.components.CartItemContent
 import com.vanard.ui.components.CountViewActions
 import com.vanard.ui.components.NormalText
@@ -61,47 +64,44 @@ fun CartScreen(
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = hiltViewModel()
 ) {
-    fun navigateBack() {
-        navController.navigateUp()
-    }
+    BaseScreen(navController, requireAuth = false, showLoading = true) {
+        val uiState by viewModel.uiState.collectAsState()
+        val context = LocalContext.current
+        val total by viewModel.total.collectAsState()
+        val localCarts by viewModel.localCarts.collectAsState()
 
-    viewModel.uiState.collectAsState().value.let { uiState ->
-        when (uiState) {
-            is UIState.Loading -> {
-//                viewModel.getCarts()
-                viewModel.getLocalCarts()
+        LaunchedEffect(Unit) {
+            viewModel.getLocalCarts()
+        }
 
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    HeaderCartScreen(navigateBack = ::navigateBack)
-                    Spacer(modifier = Modifier.weight(1f))
-                    FooterCartScreen(total = 0.0)
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            HeaderCartScreen(context, navigateBack = { navController.navigateBack() })
+
+            when (uiState) {
+                is UIState.Loading -> {
+
+                    Column(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        HeaderCartScreen(navigateBack = { navController.navigateBack() })
+                        Spacer(modifier = Modifier.weight(1f))
+                        FooterCartScreen(total = 0.0)
+                    }
                 }
-            }
 
-            is UIState.Success -> {
-                val configuration = LocalConfiguration.current
-                val screenHeight = configuration.screenHeightDp.dp
-                //
-                val context = LocalContext.current
-                val total by viewModel.total.collectAsState()
+                is UIState.Success -> {
+                    val configuration = LocalConfiguration.current
+                    val screenHeight = configuration.screenHeightDp.dp
 //                val carts by viewModel.carts.collectAsState()
-                val localCarts by viewModel.localCarts.collectAsState()
-                val scrollState = rememberLazyListState()
+                    val scrollState = rememberLazyListState()
 
-                var expandedIndex by remember { mutableStateOf<Int?>(null) }
-
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    //
-                    HeaderCartScreen(context, ::navigateBack)
-
+                    var expandedIndex by remember { mutableStateOf<Int?>(null) }
                     LazyColumn(
                         state = scrollState,
                         modifier = modifier.size((screenHeight / 2) - 36.dp),
@@ -155,21 +155,21 @@ fun CartScreen(
                             }
 
                         })
-
-                    //
-                    FooterCartScreen(
-                        context = context,
-                        total = total,
-                        cartList = localCarts
-                    )
                 }
+
+                is UIState.Error -> {
+                    ErrorScreen()
+                }
+
+                UIState.Idle -> {}
             }
 
-            is UIState.Error -> {
-                ErrorScreen()
-            }
+            FooterCartScreen(
+                context = context,
+                total = total,
+                cartList = localCarts
+            )
 
-            UIState.Idle -> {}
         }
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +36,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.vanard.common.UIState
 import com.vanard.feature.ErrorScreen
+import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
+import com.vanard.ui.base.navigateBack
 import com.vanard.ui.components.FavoriteItemContent
 import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.RemoveMenuActions
@@ -46,81 +49,84 @@ fun WishlistScreen(
     modifier: Modifier = Modifier,
     viewModel: WishlistViewModel = hiltViewModel(),
 ) {
-    fun navigateBack() {
-        navController.navigateUp()
-    }
+    BaseScreen(
+        navController = navController,
+        requireAuth = false, // Don't require auth, show different UI based on state
+        showLoading = true
+    ) { user ->
+        val uiState by viewModel.uiState.collectAsState()
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            HeaderWishlistScreen(navigateBack = { navController.navigateBack() })
 
-    viewModel.uiState.collectAsState().value.let { uiState ->
-        when (uiState) {
-            is UIState.Loading -> {
-                viewModel.getAllFavoriteProducts()
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    HeaderWishlistScreen(::navigateBack)
-                    LoadingSingleTop()
+            user?.let {
+                LaunchedEffect(Unit) {
+                    viewModel.getAllFavoriteProducts()
                 }
-            }
 
-            is UIState.Error -> {
-                ErrorScreen()
-            }
+                when (uiState) {
+                    is UIState.Loading -> {
+                        LoadingSingleTop()
+                    }
 
-            is UIState.Success -> {
-                val products by viewModel.products.collectAsState()
-                val scrollState = rememberLazyListState()
-                var expandedIndex by remember { mutableStateOf<Int?>(null) }
+                    is UIState.Error -> {
+                        ErrorScreen()
+                    }
+
+                    is UIState.Success -> {
+                        val products by viewModel.products.collectAsState()
+                        val scrollState = rememberLazyListState()
+                        var expandedIndex by remember { mutableStateOf<Int?>(null) }
 //                var expanded by remember { mutableStateOf(false) }
 
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-
-                    HeaderWishlistScreen(::navigateBack)
-
-                    LazyColumn(
-                        state = scrollState,
-                        modifier = modifier.fillMaxHeight(),
-                        contentPadding = PaddingValues(vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        content = {
-                            itemsIndexed(
-                                items = products.products,
-                                key = { index, _ -> index }) { index, product ->
-                                val menuActions = RemoveMenuActions(
-                                    onMenuClick = {
+                        LazyColumn(
+                            state = scrollState,
+                            modifier = modifier.fillMaxHeight(),
+                            contentPadding = PaddingValues(vertical = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            content = {
+                                itemsIndexed(
+                                    items = products.products,
+                                    key = { index, _ -> index }) { index, product ->
+                                    val menuActions = RemoveMenuActions(
+                                        onMenuClick = {
 //                                        expanded = true
-                                        expandedIndex = index
-                                        Log.d(TAG, "onMenuClick: ${expandedIndex == index}")
-                                    },
-                                    showMenu = expandedIndex == index,
-                                    onDismissMenu = {
-                                        expandedIndex = null
-                                        Log.d(TAG, "onDismissMenu: ${expandedIndex == index}")
-                                    },
-                                    onRemoveItem = {
-                                        viewModel.updateProductItem(product)
-                                        Log.d(TAG, "onRemoveItem: ${expandedIndex == index}")
-                                    }
-                                )
-                                FavoriteItemContent(
-                                    product,
-                                    onSelectedProduct = {},
-                                    actions = menuActions
-                                )
-                            }
+                                            expandedIndex = index
+//                                            Log.d(TAG, "onMenuClick: ${expandedIndex == index}")
+                                        },
+                                        showMenu = expandedIndex == index,
+                                        onDismissMenu = {
+                                            expandedIndex = null
+//                                            Log.d(TAG, "onDismissMenu: ${expandedIndex == index}")
+                                        },
+                                        onRemoveItem = {
+                                            viewModel.updateProductItem(product)
+                                            Log.d(
+                                                TAG,
+                                                "onRemoveItem: ${expandedIndex == index}"
+                                            )
+                                        }
+                                    )
+                                    FavoriteItemContent(
+                                        product,
+                                        onSelectedProduct = {},
+                                        actions = menuActions
+                                    )
+                                }
 
-                        })
+                            })
+                    }
+
+                    UIState.Idle -> {}
                 }
+
             }
 
-            UIState.Idle -> {}
-        }
 
+        }
     }
 }
 

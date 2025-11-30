@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -51,6 +52,7 @@ import com.vanard.common.util.toastMsg
 import com.vanard.domain.model.User
 import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
+import com.vanard.ui.base.navigateBack
 import com.vanard.ui.components.AvatarImage
 import com.vanard.ui.theme.VShopTheme
 
@@ -92,9 +94,11 @@ private fun ProfileContent(
                     popUpTo(Screen.Home.route) { inclusive = true }
                 }
             }
+
             is UIState.Error -> {
                 context.toastMsg(state.errorMessage)
             }
+
             else -> Unit
         }
     }
@@ -105,7 +109,7 @@ private fun ProfileContent(
             .padding(16.dp)
     ) {
         HeaderProfileScreen(
-            navigateBack = { navController.navigateUp() }
+            navigateBack = { navController.navigateBack() }
         )
 
         Log.d(ProfileViewModel.TAG, "ProfileContent: ${user?.email}")
@@ -187,7 +191,7 @@ private fun AuthenticatedProfileContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Divider(color = colorResource(R.color.paint_05))
+                HorizontalDivider(color = colorResource(R.color.paint_05))
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -222,7 +226,7 @@ private fun AuthenticatedProfileContent(
                 .height(56.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red.copy(alpha = 0.8f)
+                containerColor = Color.Black.copy(alpha = 0.8f)
             ),
             enabled = !isLoggingOut
         ) {

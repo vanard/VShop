@@ -19,10 +19,10 @@ class ProfileViewModel @Inject constructor(
     private val authUseCase: AuthUseCase
 ) : ViewModel() {
 
-    private val _userState = MutableStateFlow<UIState<User?>>(UIState.Loading)
+    private val _userState = MutableStateFlow<UIState<User?>>(UIState.Idle)
     val userState: StateFlow<UIState<User?>> = _userState.asStateFlow()
 
-    private val _logoutState = MutableStateFlow<UIState<Unit>>(UIState.Loading)
+    private val _logoutState = MutableStateFlow<UIState<Unit>>(UIState.Idle)
     val logoutState: StateFlow<UIState<Unit>> = _logoutState.asStateFlow()
 
     init {
