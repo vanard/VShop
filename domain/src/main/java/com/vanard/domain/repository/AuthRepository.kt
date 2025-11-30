@@ -11,7 +11,7 @@ interface AuthRepository {
     suspend fun login(request: LoginRequest): Flow<UIState<AuthResponse>>
     suspend fun signUp(request: SignUpRequest): Flow<UIState<AuthResponse>>
     suspend fun logout()
-    suspend fun getCurrentUser(): Flow<UIState<User?>>
+    fun getCurrentUser(): Flow<UIState<User?>>
     suspend fun isUserLoggedIn(): Boolean
     suspend fun saveUserSession(user: User, token: String)
     suspend fun clearUserSession()

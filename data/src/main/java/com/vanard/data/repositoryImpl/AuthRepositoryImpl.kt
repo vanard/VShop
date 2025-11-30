@@ -1,6 +1,7 @@
 package com.vanard.data.repositoryImpl
 
 import com.vanard.common.UIState
+import com.vanard.common.helpers.UUIDv7
 import com.vanard.data.dao.UserDao
 import com.vanard.data.mappers.toDomain
 import com.vanard.data.mappers.toEntity
@@ -9,6 +10,7 @@ import com.vanard.domain.model.auth.AuthResponse
 import com.vanard.domain.model.auth.LoginRequest
 import com.vanard.domain.model.auth.SignUpRequest
 import com.vanard.domain.model.User
+import com.vanard.domain.model.dummyUser
 import com.vanard.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -52,27 +54,18 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 // For demo: check if it's demo credentials
                 if (request.email == "demo@vshop.com" && request.password == "demo123") {
-                    // Create a demo user
-                    val demoUser = User(
-                        id = 999,
-                        email = "demo@vshop.com",
-                        firstName = "Demo",
-                        lastName = "User",
-                        phone = "+1234567890"
-                    )
-
                     // Insert demo user
-                    userDao.insertUser(demoUser.toEntity().copy(id = 999))
+                    userDao.insertUser(dummyUser.toEntity().copy(id = dummyUser.id))
 
                     val token = generateAuthToken()
-                    val authResponse = AuthResponse(user = demoUser, token = token)
+                    val authResponse = AuthResponse(user = dummyUser, token = token)
 
                     preferencesManager.saveUserSession(
-                        userId = demoUser.id,
-                        email = demoUser.email,
-                        firstName = demoUser.firstName,
-                        lastName = demoUser.lastName,
-                        phone = demoUser.phone,
+                        userId = dummyUser.id,
+                        email = dummyUser.email,
+                        firstName = dummyUser.firstName,
+                        lastName = dummyUser.lastName,
+                        phone = dummyUser.phone,
                         token = token
                     )
 
@@ -98,25 +91,24 @@ class AuthRepositoryImpl @Inject constructor(
 
             // Create new user
             val newUser = User(
-                id = 0, // Room will auto-generate
+                id = generateIDUser(),
                 email = request.email,
                 firstName = request.firstName,
                 lastName = request.lastName,
                 phone = request.phone
             )
 
-            val userId = userDao.insertUser(newUser.toEntity())
+            userDao.insertUser(newUser.toEntity())
             val token = generateAuthToken()
 
-            val userWithId = newUser.copy(id = userId)
             val authResponse = AuthResponse(
-                user = userWithId,
+                user = newUser,
                 token = token
             )
 
             // Save user session
             preferencesManager.saveUserSession(
-                userId = userId,
+                userId = newUser.id,
                 email = request.email,
                 firstName = request.firstName,
                 lastName = request.lastName,
@@ -134,38 +126,56 @@ class AuthRepositoryImpl @Inject constructor(
         preferencesManager.clearUserSession()
     }
 
-    override suspend fun getCurrentUser(): Flow<UIState<User?>> = flow {
-        try {
-            val isLoggedIn = preferencesManager.isLoggedIn.first()
-            if (isLoggedIn) {
-                val userId = preferencesManager.userId.first()
-                val email = preferencesManager.userEmail.first()
-                val firstName = preferencesManager.userFirstName.first()
-                val lastName = preferencesManager.userLastName.first()
-                val phone = preferencesManager.userPhone.first()
-
-                if (userId > 0) {
-                    val user = User(
-                        id = userId,
-                        email = email,
-                        firstName = firstName,
-                        lastName = lastName,
-                        phone = phone.takeIf { it.isNotEmpty() }
-                    )
-                    emit(UIState.Success(user))
+    override fun getCurrentUser(): Flow<UIState<User?>> {
+        // Combine all user preference flows to react to changes
+        return combine(
+            preferencesManager.isLoggedIn,
+            preferencesManager.userPrefsFlow
+        ) { isLoggedIn: Boolean, user ->
+            try {
+                if (isLoggedIn && user.id.isNotEmpty()) {
+                    UIState.Success(user)
                 } else {
-                    emit(UIState.Success(null))
+                    UIState.Success(null)
                 }
-            } else {
-                emit(UIState.Success(null))
+            } catch (e: Exception) {
+                UIState.Error("Failed to get current user: ${e.message}")
             }
-        } catch (e: Exception) {
-            emit(UIState.Error("Failed to get current user: ${e.message}"))
         }
     }
 
+//    override suspend fun getCurrentUser(): Flow<UIState<User?>> = flow {
+//        try {
+//            val isLoggedIn = preferencesManager.isLoggedIn.first()
+//            if (isLoggedIn) {
+//                val userId = preferencesManager.userId.first()
+//                val email = preferencesManager.userEmail.first()
+//                val firstName = preferencesManager.userFirstName.first()
+//                val lastName = preferencesManager.userLastName.first()
+//                val phone = preferencesManager.userPhone.first()
+//
+//                if (userId > 0) {
+//                    val user = User(
+//                        id = userId,
+//                        email = email,
+//                        firstName = firstName,
+//                        lastName = lastName,
+//                        phone = phone.takeIf { it.isNotEmpty() }
+//                    )
+//                    emit(UIState.Success(user))
+//                } else {
+//                    emit(UIState.Success(null))
+//                }
+//            } else {
+//                emit(UIState.Success(null))
+//            }
+//        } catch (e: Exception) {
+//            emit(UIState.Error("Failed to get current user: ${e.message}"))
+//        }
+//    }
+
     override suspend fun isUserLoggedIn(): Boolean {
-        return preferencesManager.isLoggedIn.first()
+        return preferencesManager.isLoggedIn.first() && preferencesManager.userId.first().isNotEmpty()
     }
 
     override suspend fun saveUserSession(user: User, token: String) {
@@ -185,5 +195,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     private fun generateAuthToken(): String {
         return "token_${UUID.randomUUID()}"
+    }
+
+    private fun generateIDUser(): String {
+        return UUIDv7.randomUUID().toString()
     }
 }

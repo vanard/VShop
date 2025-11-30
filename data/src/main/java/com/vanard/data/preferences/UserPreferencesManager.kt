@@ -5,10 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.vanard.domain.model.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,7 +22,7 @@ class UserPreferencesManager @Inject constructor(
 ) {
     companion object {
         private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
-        private val USER_ID = longPreferencesKey("user_id")
+        private val USER_ID = stringPreferencesKey("user_id")
         private val USER_EMAIL = stringPreferencesKey("user_email")
         private val USER_FIRST_NAME = stringPreferencesKey("user_first_name")
         private val USER_LAST_NAME = stringPreferencesKey("user_last_name")
@@ -33,32 +34,49 @@ class UserPreferencesManager @Inject constructor(
         preferences[IS_LOGGED_IN] ?: false
     }
 
-    val userId: Flow<Long> = context.dataStore.data.map { preferences ->
-        preferences[USER_ID] ?: 0L
+    val userId: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[USER_ID] ?: ""
     }
 
-    val userEmail: Flow<String> = context.dataStore.data.map { preferences ->
+    private val userEmail: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USER_EMAIL] ?: ""
     }
 
-    val userFirstName: Flow<String> = context.dataStore.data.map { preferences ->
+    private val userFirstName: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USER_FIRST_NAME] ?: ""
     }
 
-    val userLastName: Flow<String> = context.dataStore.data.map { preferences ->
+    private val userLastName: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USER_LAST_NAME] ?: ""
     }
 
-    val userPhone: Flow<String> = context.dataStore.data.map { preferences ->
+    private val userPhone: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USER_PHONE] ?: ""
     }
 
-    val authToken: Flow<String> = context.dataStore.data.map { preferences ->
+    private val authToken: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[AUTH_TOKEN] ?: ""
     }
 
+    val userPrefsFlow: Flow<User> =
+        combine(
+            userId,
+            userEmail,
+            userFirstName,
+            userLastName,
+            userPhone,
+        ) { userId, email, firstName, lastName, phone ->
+            User(
+                id = userId,
+                email = email,
+                firstName = firstName,
+                lastName = lastName,
+                phone = phone.takeIf { it.isNotEmpty() }
+            )
+        }
+
     suspend fun saveUserSession(
-        userId: Long,
+        userId: String,
         email: String,
         firstName: String,
         lastName: String,

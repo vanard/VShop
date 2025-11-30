@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class UserUseCase(
     private val authRepository: AuthRepository
 ) {
-    suspend fun getCurrentUser(): Flow<UIState<User?>> {
+    fun getCurrentUser(): Flow<UIState<User?>> {
         return authRepository.getCurrentUser()
     }
 
