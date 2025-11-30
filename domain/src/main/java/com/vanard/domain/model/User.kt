@@ -1,7 +1,7 @@
 package com.vanard.domain.model
 
 data class User(
-    val id: Long = 0,
+    val id: String,
     val email: String,
     val firstName: String,
     val lastName: String,
@@ -22,11 +22,25 @@ data class Address(
         get() = "$street, $city, $zipCode, $country"
 }
 
+//val dummyUser = User(
+//    id = "0192f5cd-0c2e-7a3f-b1d2-8b9a6d2b4c11",
+//    email = "john.doe@example.com",
+//    firstName = "John",
+//    lastName = "Doe",
+//    phone = "+1234567890",
+//    address = Address(
+//        street = "123 Main St",
+//        city = "New York",
+//        zipCode = "10001",
+//        country = "USA"
+//    )
+//)
+
 val dummyUser = User(
-    id = 1,
-    email = "john.doe@example.com",
-    firstName = "John",
-    lastName = "Doe",
+    id = "0192f5cd-0c2e-7a3f-b1d2-8b9a6d2b4c11",
+    email = "demo@vshop.com",
+    firstName = "Demo",
+    lastName = "User",
     phone = "+1234567890",
     address = Address(
         street = "123 Main St",
