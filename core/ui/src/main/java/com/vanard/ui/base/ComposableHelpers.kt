@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.vanard.common.UIState
 import com.vanard.common.helpers.ViewModelEvent
 import com.vanard.resources.R
@@ -365,4 +366,8 @@ fun <T> ListUIStateContent(
             itemContent(items)
         }
     }
+}
+
+fun NavController.navigateBack() {
+    this.navigateUp()
 }
