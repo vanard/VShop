@@ -250,7 +250,7 @@ class SessionViewModel @Inject constructor(
     /**
      * Get current user ID if available
      */
-    fun getCurrentUserId(): Long? {
+    fun getCurrentUserId(): String? {
         return getCurrentUserSync()?.id
     }
 

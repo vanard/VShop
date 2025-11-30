@@ -165,14 +165,17 @@ private fun NavController.unauthorized(requireAuth: Boolean, redirectToOnboard: 
 
 private fun NavController.isAuthorized() {
     val destination = Screen.Home.route
-    navigateToDestination(destination)
+//    navigateToDestination(destination)
 
-//    if (currentDestination?.route != destination) {
-//        this.navigate(destination) {
-//            popUpTo(0) { inclusive = true }
-//        }
-//    }
+    if (currentDestination?.route in unauthorizedScreen) {
+        this.navigate(destination) {
+            popUpTo(0) { inclusive = true }
+        }
+    }
 }
+
+private val authorizedScreen = listOf(Screen.Home.route, Screen.Wishlist.route, Screen.Cart.route, Screen.Profile.route, Screen.Detail.route)
+private val unauthorizedScreen = listOf(Screen.Onboard.route, Screen.Login.route, Screen.SignUp.route)
 
 private fun NavController.navigateToDestination(destination: String) {
     if (currentDestination?.route != destination) {
