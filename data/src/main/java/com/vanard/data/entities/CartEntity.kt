@@ -3,7 +3,6 @@ package com.vanard.data.entities
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.vanard.domain.model.Rating
 
 @Entity(tableName = "carts_item")
 data class CartEntity(
@@ -14,7 +13,7 @@ data class CartEntity(
     val category: String,
     val image: String,
     val quantity: Long,
-    @Embedded val rating: RatingEntity,
+    @Embedded(prefix = "rating_") val rating: RatingEntity,
     val description: String,
     var isFavorite: Boolean,
 )

@@ -11,12 +11,5 @@ data class UserEntity(
     val firstName: String,
     val lastName: String,
     val phone: String? = null,
-    @Embedded val address: AddressEntity? = null
-)
-
-data class AddressEntity(
-    val street: String,
-    val city: String,
-    val zipCode: String,
-    val country: String
+    @Embedded(prefix = "address_") val address: AddressEntity? = null
 )

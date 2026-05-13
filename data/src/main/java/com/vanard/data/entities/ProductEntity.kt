@@ -12,12 +12,7 @@ data class ProductEntity(
     val description: String,
     val category: String,
     val image: String,
-    @Embedded val rating: RatingEntity?,
+    @Embedded(prefix = "rating_") val rating: RatingEntity?,
     var isFavorite: Boolean,
     var quantityInCart: Int
-)
-
-data class RatingEntity(
-    val rate: Double,
-    val count: Long,
 )
