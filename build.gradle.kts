@@ -8,3 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.android.library) apply false
 }
+
+extra["minSdk"] = 24
+extra["compileSdk"] = 36
+extra["targetSdk"] = 36
