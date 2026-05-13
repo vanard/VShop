@@ -2,11 +2,13 @@ package com.vanard.vshop.persentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,9 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
@@ -32,7 +33,10 @@ import com.vanard.feature.detail.DetailScreen
 import com.vanard.feature.home.HomeScreen
 import com.vanard.feature.profile.ProfileScreen
 import com.vanard.feature.wishlist.WishlistScreen
-import com.vanard.resources.R
+import com.vanard.ui.theme.VShopBackground
+import com.vanard.ui.theme.VShopSurface
+import com.vanard.ui.theme.VShopTextPrimary
+import com.vanard.ui.theme.VShopTextSecondary
 import com.vanard.ui.theme.VShopTheme
 import com.vanard.vshop.navigation.getAllNavigationItem
 import com.vanard.vshop.persentation.onboard.OnboardScreen
@@ -44,13 +48,13 @@ fun VShopApp(
 ) {
     // Check authentication status to determine start destination
     var startDestination by remember { mutableStateOf(Screen.Onboard.route) }
-    val context = LocalContext.current
     
     // You can add logic here to check if user is logged in
     // For now, we'll start with onboard as default
     // TODO
 
     Scaffold(
+        containerColor = VShopBackground,
         bottomBar = {
             if (appState.shouldShowBottomBar) {
                 VShopBottomBar(
@@ -82,8 +86,9 @@ private fun VShopBottomBar(
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
-        containerColor = colorResource(R.color.paint_05),
+        containerColor = VShopSurface,
         modifier = modifier,
+        tonalElevation = 0.dp,
     ) {
         getAllNavigationItem().map { item ->
             val selected = currentRoute == item.screen.route
@@ -91,7 +96,14 @@ private fun VShopBottomBar(
                 icon = {
                     Icon(
                         painter = if (selected) item.selectedIcon else item.icon,
-                        contentDescription = null
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp)
+                    )
+                },
+                label = {
+                    Text(
+                        text = item.screen.route.replaceFirstChar { it.uppercase() },
+                        color = if (selected) VShopTextPrimary else VShopTextSecondary
                     )
                 },
                 selected = selected,
@@ -99,8 +111,10 @@ private fun VShopBottomBar(
                    navigateToRoute(item.screen.route)
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = colorResource(R.color.paint_04),
-                    selectedTextColor = colorResource(R.color.paint_04),
+                    selectedIconColor = VShopTextPrimary,
+                    unselectedIconColor = VShopTextSecondary,
+                    selectedTextColor = VShopTextPrimary,
+                    unselectedTextColor = VShopTextSecondary,
                     indicatorColor = Color.Transparent,
                 )
             )

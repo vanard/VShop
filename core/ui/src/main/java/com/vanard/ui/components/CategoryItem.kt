@@ -1,72 +1,98 @@
 package com.vanard.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanard.resources.R
+import com.vanard.ui.theme.VShopDark
+import com.vanard.ui.theme.VShopSoftSurface
+import com.vanard.ui.theme.VShopSurface
+import com.vanard.ui.theme.VShopTextSecondary
 import com.vanard.ui.theme.VShopTheme
 
 @Composable
 fun CategoryItemContent(
-    category: String, isSelected: Boolean = false,
+    category: String,
+    isSelected: Boolean = false,
     onSelectionChanged: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val shapeBg = RoundedCornerShape(8.dp)
-    val colorBorder = if (isSelected)
-        colorResource(R.color.paint_01)
-    else colorResource(R.color.colorDFDEDE)
-    val colorBg = if (isSelected)
-        colorResource(R.color.paint_01)
-    else
-        Color.Transparent
+    val containerColor = if (isSelected) VShopDark else VShopSoftSurface
+    val contentColor = if (isSelected) VShopSurface else VShopTextSecondary
 
-    val rowModifier = modifier
-        .toggleable(value = isSelected, onValueChange = {
-            onSelectionChanged(category)
-        })
-        .border(
-            1.dp,
-            color = colorBorder,
-            shape = shapeBg
-        )
-        .background(
-            color = colorBg,
-            shape = shapeBg
-        )
-        .padding(12.dp)
-
-    Surface(shadowElevation = 4.dp, modifier = modifier.clip(shapeBg)) {
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.clickable { onSelectionChanged(category) }
+    ) {
         Row(
-            modifier = rowModifier
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
             Text(
-                fontSize = 12.sp, text = category, color = if (isSelected)
-                    colorResource(R.color.white)
-                else colorResource(R.color.paint_01)
+                text = category,
+                color = contentColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
             )
         }
     }
+}
 
+@Composable
+fun CategoryIconItem(
+    title: String,
+    iconRes: Int = R.drawable.category,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = title,
+            tint = VShopTextSecondary,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(VShopSoftSurface)
+                .padding(12.dp)
+        )
+        Text(
+            text = title,
+            color = VShopTextSecondary,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CategoryItemPreview() {
     VShopTheme {
-        CategoryItemContent("dummyProduct")
+        Row(modifier = Modifier.padding(16.dp)) {
+            CategoryIconItem("Mobile")
+        }
     }
 }

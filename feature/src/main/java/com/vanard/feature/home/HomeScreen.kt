@@ -1,9 +1,10 @@
 package com.vanard.feature.home
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,14 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells.Fixed
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -33,12 +34,11 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,17 +49,24 @@ import com.vanard.common.Screen
 import com.vanard.common.UIState
 import com.vanard.common.util.firstWords
 import com.vanard.common.util.toastMsg
+import com.vanard.domain.model.Categories
+import com.vanard.domain.model.Product
 import com.vanard.domain.model.User
 import com.vanard.domain.model.getAllCategories
 import com.vanard.domain.model.getCategories
 import com.vanard.feature.ErrorScreen
 import com.vanard.feature.base.BaseScreen
 import com.vanard.resources.R
-import com.vanard.ui.components.AvatarImage
-import com.vanard.ui.components.ChipGroup
-import com.vanard.ui.components.CustomSearchBar
+import com.vanard.ui.components.CategoryIconItem
+import com.vanard.ui.components.FeaturedOfferCard
+import com.vanard.ui.components.FilterChipButton
 import com.vanard.ui.components.LoadingSingleTop
+import com.vanard.ui.components.SearchAndFilterBar
 import com.vanard.ui.components.ShopItemContent
+import com.vanard.ui.theme.VShopBackground
+import com.vanard.ui.theme.VShopTextPrimary
+import com.vanard.ui.theme.VShopTextSecondary
+import com.vanard.ui.theme.VShopTextTertiary
 import com.vanard.ui.theme.VShopTheme
 import kotlinx.coroutines.launch
 
@@ -75,21 +82,21 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    // Use BaseScreen to provide optional user data
     BaseScreen(
         navController = navController,
-        requireAuth = false, // Don't require auth, but provide user data if available
-        showLoading = false // Don't show loading for home screen
+        requireAuth = false,
+        showLoading = false
     ) { user ->
         HomeContent(
             navController = navController,
-            user = user, // This will be null if not authenticated
+            user = user,
             viewModel = viewModel,
             modifier = modifier
         )
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeContent(
     navController: NavController,
@@ -98,277 +105,291 @@ private fun HomeContent(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-//    val products by viewModel.products.collectAsState()
-//    val searchText by viewModel.searchText.collectAsState()
-//    val isSearching by viewModel.isSearching.collectAsState()
-//    val selectedCategory = viewModel.selectedCategory.value
 
     LaunchedEffect(Unit) {
         viewModel.getProducts()
     }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
+            .background(VShopBackground)
     ) {
-        // Header with user greeting (if authenticated)
-        if (user != null && user.id.isNotEmpty()) {
-            HomeHeaderLogin()
-        } else {
-            HomeHeaderGuest(
-                user = user,
-                onProfileClick = { navController.navigate(Screen.Profile.route) },
-                onLoginClick = { navController.navigate(Screen.Login.route) }
-            )
-        }
-
-        // Rest of your existing home screen content...
-        // SearchBar, Categories, Products, etc.
-
-        // Your existing HomeScreen content here
         when (uiState) {
-            is UIState.Loading -> {
-//                viewModel.getProducts()
-                Spacer(Modifier.size(16.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                ) {
-                    CustomSearchBar(
-                        query = "",
-                        onQueryChanged = viewModel::onSearchTextChange,
-                        modifier = modifier
-                            .weight(1f)
-                    )
-                    IconButton(
-                        onClick = {},
-                        modifier = modifier
-                            .padding(start = 16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = colorResource(R.color.paint_01))
-                            .size(56.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.setting_4),
-                            tint = Color.White,
-                            contentDescription = "Icon"
-                        )
-                    }
-                }
-
-                ChipGroup(
-                    categories = getAllCategories(),
-                    selectedCategories = viewModel.selectedCategory.value,
-                    onSelectedChanged = {}
-                )
-
-                LoadingSingleTop()
-//                }
-            }
-
+            is UIState.Loading -> HomeLoadingContent(viewModel = viewModel)
             is UIState.Success -> {
                 val context = LocalContext.current
                 val coroutineScope = rememberCoroutineScope()
                 val scrollState = rememberLazyListState()
-                val scrollGridState = rememberLazyStaggeredGridState()
-
                 val products by viewModel.products.collectAsState()
                 val searchText by viewModel.searchText.collectAsState()
                 val isSearching by viewModel.isSearching.collectAsState()
 
-                fun scrollToTop() {
-                    coroutineScope.launch {
-//                            delay(10)
-                        withFrameNanos { }
-                        scrollGridState.scrollToItem(0)
-                    }
+                fun openProduct(product: Product) {
+                    navController.navigate(Screen.Detail.detailRoute(product.id))
                 }
 
-                Spacer(Modifier.size(16.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(HomeScreenTestTag.LAZY_LIST),
+                    contentPadding = PaddingValues(start = 20.dp, top = 18.dp, end = 20.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(22.dp)
                 ) {
-                    CustomSearchBar(
-                        query = searchText,
-                        onQueryChanged = viewModel::onSearchTextChange,
-                        modifier = modifier
-                            .weight(1f)
-                            .testTag(HomeScreenTestTag.SEARCH)
-                    )
-                    IconButton(
-                        onClick = {
-                            viewModel.sortProducts()
-                            scrollToTop()
-                        },
-                        modifier = modifier
-                            .padding(start = 16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = colorResource(R.color.paint_01))
-                            .size(56.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.setting_4),
-                            tint = Color.White,
-                            contentDescription = null
+                    item {
+                        HomeLocationHeader(
+                            user = user,
+                            onProfileClick = { navController.navigate(Screen.Profile.route) }
+                        )
+                    }
+
+                    item {
+                        SearchAndFilterBar(
+                            query = searchText,
+                            onQueryChanged = viewModel::onSearchTextChange,
+                            onFilterClick = {
+                                viewModel.sortProducts()
+                                coroutineScope.launch {
+                                    withFrameNanos { }
+                                    scrollState.animateScrollToItem(0)
+                                }
+                            },
+                            modifier = Modifier.testTag(HomeScreenTestTag.SEARCH)
+                        )
+                    }
+
+                    item { ProductCategories() }
+                    item { ExclusiveOffers() }
+                    item {
+                        ProductRowSection(
+                            title = "Trending Now",
+                            products = products.products.take(6),
+                            onSelectedProduct = ::openProduct,
+                            onFavClick = { product ->
+                                val message = if (product.isFavorite) {
+                                    "${product.title.firstWords(2)} has been removed from your favorites."
+                                } else {
+                                    "${product.title.firstWords(2)} has been added to your favorites."
+                                }
+                                viewModel.updateProductItem(product)
+                                context.toastMsg(message)
+                            }
+                        )
+                    }
+
+                    item {
+                        JustForYouFilters(
+                            selectedCategory = viewModel.selectedCategory.value,
+                            onSelectedCategory = {
+                                viewModel.selectCategory(getCategories(it))
+                            }
+                        )
+                    }
+
+                    if (isSearching) {
+                        item { LoadingSingleTop() }
+                    }
+
+                    productGridItems(
+                        items = products.products
+                    ) { index, product ->
+                        ShopItemContent(
+                            product = product,
+                            onSelectedProduct = { openProduct(product) },
+                            onFavClick = {
+                                viewModel.updateProductItem(product)
+                                context.toastMsg("${product.title.firstWords(2)} updated")
+                            },
+                            badgeText = if (index % 3 == 0) "Featured" else null
                         )
                     }
                 }
-
-                ChipGroup(
-                    state = scrollState,
-                    categories = getAllCategories(),
-                    selectedCategories = viewModel.selectedCategory.value,
-                    onSelectedChanged = {
-                        viewModel.selectCategory(getCategories(it))
-                        scrollToTop()
-                    })
-
-                if (isSearching) {
-                    LoadingSingleTop()
-                }
-
-                LazyVerticalStaggeredGrid(
-                    state = scrollGridState,
-                    columns = Fixed(2),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    verticalItemSpacing = 24.dp,
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
-                    modifier = Modifier.testTag(HomeScreenTestTag.LAZY_LIST),
-                    content = {
-                        items(
-                            items = products.products,
-                            key = { it.id }) { product ->
-                            ShopItemContent(
-                                product,
-                                onSelectedProduct = {
-                                    navController.navigate(
-                                        route = Screen.Detail.detailRoute(
-                                            product.id
-                                        )
-                                    )
-                                },
-                                onFavClick = {
-                                    val message = if (product.isFavorite)
-                                        "${product.title.firstWords(2)} has been removed from your favorites."
-                                    else
-                                        "${product.title.firstWords(2)} has been added to your favorites."
-
-                                    viewModel.updateProductItem(product)
-                                    context.toastMsg(message)
-                                },
-                                modifier = modifier
-                                    .animateItem(
-                                        tween(300)
-                                    )
-                                    .testTag(product.title)
-                            )
-                        }
-                    }
-                )
-//                }
             }
 
-            is UIState.Error -> {
-                ErrorScreen()
-            }
-
-            UIState.Idle -> {}
+            is UIState.Error -> ErrorScreen()
+            UIState.Idle -> Unit
         }
     }
 }
 
 @Composable
-private fun HomeHeaderGuest(
+private fun HomeLoadingContent(viewModel: HomeViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(VShopBackground)
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        HomeLocationHeader(user = null, onProfileClick = {})
+        SearchAndFilterBar(query = "", onQueryChanged = viewModel::onSearchTextChange, onFilterClick = {})
+        ProductCategories()
+        LoadingSingleTop()
+    }
+}
+
+@Composable
+private fun HomeLocationHeader(
     user: User?,
     onProfileClick: () -> Unit,
-    onLoginClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.paint_04)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "Current Location", color = VShopTextTertiary, fontSize = 10.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = if (user != null) "Hello, ${user.firstName}!" else "Welcome, Guest!",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.paint_01)
+                    text = user?.let { "${it.firstName} City" } ?: "Waterloo, Canada",
+                    color = VShopTextPrimary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = if (user != null) "Ready to shop?" else "Sign in for personalized experience",
-                    fontSize = 14.sp,
-                    color = colorResource(R.color.paint_02)
+                Icon(
+                    painter = painterResource(R.drawable.arrow_right_1),
+                    contentDescription = null,
+                    tint = VShopTextPrimary,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(13.dp)
                 )
             }
+        }
+        IconButton(onClick = onProfileClick, modifier = Modifier.size(40.dp)) {
+            Icon(
+                painter = painterResource(R.drawable.profile_circle),
+                contentDescription = "Profile",
+                tint = VShopTextPrimary,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
 
-            if (user != null) {
-                IconButton(onClick = onProfileClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.profile),
-                        contentDescription = "Profile",
-                        tint = colorResource(R.color.paint_01)
-                    )
-                }
-            } else {
-                TextButton(onClick = onLoginClick) {
-                    Text(
-                        text = "Sign In",
-                        color = colorResource(R.color.paint_01),
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+@Composable
+private fun ProductCategories() {
+    val categories = listOf(
+        "Watch" to R.drawable.shopping_bag,
+        "Mobile" to R.drawable.ic_phone,
+        "Books" to R.drawable.category,
+        "Cars" to R.drawable.shopping_cart,
+        "Laptop" to R.drawable.profile_bulk,
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SectionHeader(title = "Product Categories")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            categories.forEach { (title, icon) ->
+                CategoryIconItem(title = title, iconRes = icon)
             }
         }
     }
 }
 
 @Composable
-fun HomeHeaderLogin(modifier: Modifier = Modifier) {
-    Row(modifier = modifier.padding(top = 20.dp)) {
-        Column(
-            modifier = modifier
-                .weight(1f)
-                .padding(end = 24.dp)
-        ) {
-            Text(
-                text = "Hello, Welcome \uD83D\uDC4B",
-                fontSize = 14.sp,
-                modifier = modifier.weight(1f, fill = false)
-            )
-
-            Spacer(Modifier.size(8.dp))
-
-            Text(
-                text = "User Guest",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = modifier.weight(1f, fill = false)
-            )
+private fun ExclusiveOffers() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(text = "Exclusive Offers", color = VShopTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            FeaturedOfferCard(title = "20% OFF", subtitle = "Up to", action = "Shop Now", modifier = Modifier.width(220.dp))
+            FeaturedOfferCard(title = "40 USD", subtitle = "Order over $", action = "Cashback", modifier = Modifier.width(220.dp))
         }
+    }
+}
 
-        AvatarImage(
-            painter = painterResource(R.drawable.product1),
-            modifier = Modifier
-                .size(60.dp)
-                .align(Alignment.CenterVertically)
+@Composable
+private fun ProductRowSection(
+    title: String,
+    products: List<Product>,
+    onSelectedProduct: (Product) -> Unit,
+    onFavClick: (Product) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SectionHeader(title = title)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            itemsIndexed(products, key = { _, item -> item.id }) { index, product ->
+                ShopItemContent(
+                    product = product,
+                    onSelectedProduct = { onSelectedProduct(product) },
+                    onFavClick = { onFavClick(product) },
+                    badgeText = if (index == 0) "4.9(2k)" else null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun JustForYouFilters(
+    selectedCategory: Categories?,
+    onSelectedCategory: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(text = "Just For You", color = VShopTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            FilterChipButton(text = "Filter") {
+                Icon(
+                    painter = painterResource(R.drawable.setting_4),
+                    tint = VShopTextSecondary,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+            getAllCategories().forEach { category ->
+                FilterChipButton(
+                    text = if (category == selectedCategory) "${category.value} ✓" else category.value,
+                    onClick = { onSelectedCategory(category.value) },
+                    modifier = Modifier.clip(RoundedCornerShape(6.dp))
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(title: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            color = VShopTextPrimary,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            modifier = Modifier.weight(1f)
         )
+        TextButton(onClick = {}) {
+            Text(text = "See All", color = VShopTextSecondary, fontSize = 12.sp)
+        }
+    }
+}
+
+private fun LazyListScope.productGridItems(
+    items: List<Product>,
+    itemContent: @Composable (Int, Product) -> Unit,
+) {
+    items.chunked(2).forEachIndexed { rowIndex, rowItems ->
+        item(key = "grid-$rowIndex") {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+                rowItems.forEachIndexed { columnIndex, product ->
+                    Box(modifier = Modifier.weight(1f)) {
+                        itemContent(rowIndex * 2 + columnIndex, product)
+                    }
+                }
+                if (rowItems.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
     }
 }
 
@@ -376,8 +397,6 @@ fun HomeHeaderLogin(modifier: Modifier = Modifier) {
 @Composable
 fun HomeScreenPreview(modifier: Modifier = Modifier) {
     VShopTheme {
-//        Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         HomeScreen(rememberNavController())
-//        }
     }
 }

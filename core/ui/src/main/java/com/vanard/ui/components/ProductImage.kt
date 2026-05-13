@@ -35,7 +35,7 @@ fun ProductImage(imageUrl: String, modifier: Modifier = defaultModifier) {
         model = imageRequest,
 //        model = imageUrl,
         contentDescription = "Product image",
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.Fit,
         modifier = modifier,
         loading = { LoadingState() }
     )

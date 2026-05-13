@@ -49,7 +49,7 @@ fun CountView(
                 onMinusClick(quantity)
                 Log.d(TAG, "Plus Click: $quantity")
             }, modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 4.dp)
                 .border(1.dp, color = colorResource(R.color.paint_03), shape = CircleShape)
                 .clip(CircleShape)
                 .background(color = Color.Transparent)
@@ -71,7 +71,7 @@ fun CountView(
                 onPlusClick(quantity)
                 Log.d(TAG, "Plus Click: $quantity")
             }, modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 4.dp)
                 .border(1.dp, color = colorResource(R.color.paint_03), shape = CircleShape)
                 .clip(CircleShape)
                 .background(color = Color.Transparent)
