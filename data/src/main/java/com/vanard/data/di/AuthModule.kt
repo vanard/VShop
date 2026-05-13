@@ -17,11 +17,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AuthModule {
 
-    @Provides
-    @Singleton
-    fun provideUserDao(database: AppDatabase): UserDao {
-        return database.getUserDao()
-    }
+//    @Provides
+//    @Singleton
+//    fun provideUserDao(database: AppDatabase): UserDao {
+//        return database.getUserDao()
+//    }
 
     @Provides
     @Singleton

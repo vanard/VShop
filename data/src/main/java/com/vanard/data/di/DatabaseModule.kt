@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.vanard.data.dao.CartDao
 import com.vanard.data.dao.ProductDao
+import com.vanard.data.dao.UserDao
 import com.vanard.data.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -27,4 +28,7 @@ object DatabaseModule {
 
     @Provides
     fun provideCartDao(db: AppDatabase): CartDao = db.getCartDao()
+
+    @Provides
+    fun provideUserDao(db: AppDatabase): UserDao = db.getUserDao()
 }
