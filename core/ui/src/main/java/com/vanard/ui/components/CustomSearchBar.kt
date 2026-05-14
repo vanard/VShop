@@ -21,8 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import com.vanard.resources.R
 import com.vanard.ui.theme.VShopSoftSurface
 import com.vanard.ui.theme.VShopTextPrimary
@@ -36,7 +39,20 @@ fun CustomSearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Search Products",
     showVoiceIcon: Boolean = true,
+    leadingIconRes: Int = R.drawable.search_normal,
+    leadingIconContentDescription: String = "Search Icon",
+    onLeadingIconClick: (() -> Unit)? = null,
+    onSearch: () -> Unit = {},
 ) {
+    val leadingIcon = @Composable {
+        Icon(
+            painter = painterResource(leadingIconRes),
+            tint = VShopTextSecondary,
+            contentDescription = leadingIconContentDescription,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+
     TextField(
         value = query,
         onValueChange = onQueryChanged,
@@ -44,12 +60,13 @@ fun CustomSearchBar(
             .height(52.dp)
             .clip(RoundedCornerShape(18.dp)),
         leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.search_normal),
-                tint = VShopTextSecondary,
-                contentDescription = "Search Icon",
-                modifier = Modifier.size(20.dp)
-            )
+            if (onLeadingIconClick == null) {
+                leadingIcon()
+            } else {
+                IconButton(onClick = onLeadingIconClick, modifier = Modifier.size(40.dp)) {
+                    leadingIcon()
+                }
+            }
         },
         trailingIcon = if (showVoiceIcon) {
             {
@@ -65,6 +82,8 @@ fun CustomSearchBar(
             Text(text = placeholder, color = VShopTextTertiary, fontSize = 13.sp)
         },
         singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { onSearch() }),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = VShopSoftSurface,
             unfocusedContainerColor = VShopSoftSurface,
@@ -86,6 +105,9 @@ fun SearchAndFilterBar(
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "Search Products",
+    isSearchMode: Boolean = false,
+    onSearchClick: () -> Unit = {},
+    onExitSearchClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -95,10 +117,14 @@ fun SearchAndFilterBar(
             query = query,
             onQueryChanged = onQueryChanged,
             placeholder = placeholder,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            leadingIconRes = if (isSearchMode) R.drawable.arrow_left_1 else R.drawable.search_normal,
+            leadingIconContentDescription = if (isSearchMode) "Exit Search" else "Search Icon",
+            onLeadingIconClick = if (isSearchMode) onExitSearchClick else null,
+            onSearch = onSearchClick
         )
         IconButton(
-            onClick = onFilterClick,
+            onClick = if (isSearchMode) onFilterClick else onSearchClick,
             modifier = Modifier
                 .padding(start = 12.dp)
                 .size(52.dp)
@@ -106,9 +132,9 @@ fun SearchAndFilterBar(
                 .background(VShopSoftSurface)
         ) {
             Icon(
-                painter = painterResource(R.drawable.setting_4),
+                painter = painterResource(if (isSearchMode) R.drawable.setting_4 else R.drawable.search_normal),
                 tint = VShopTextPrimary,
-                contentDescription = "Filter",
+                contentDescription = if (isSearchMode) "Filter" else "Search",
                 modifier = Modifier.size(22.dp)
             )
         }

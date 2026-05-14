@@ -48,12 +48,13 @@ fun ShopItemContent(
     onFavClick: () -> Unit,
     modifier: Modifier = Modifier,
     badgeText: String? = null,
+    fillWidth: Boolean = false,
 ) {
     val iconHeart = if (product.isFavorite) painterResource(R.drawable.heart_bold) else painterResource(R.drawable.heart)
 
     Column(
         modifier
-            .width(160.dp)
+            .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.width(160.dp))
             .clickable(onClick = onSelectedProduct)
     ) {
         Box(

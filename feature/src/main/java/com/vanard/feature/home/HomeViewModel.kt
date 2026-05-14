@@ -11,16 +11,12 @@ import com.vanard.domain.model.ProductList
 import com.vanard.domain.usecase.product.ProductUseCase
 import com.vanard.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,30 +26,25 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
+    private val _submittedSearchText = MutableStateFlow("")
+    val submittedSearchText = _submittedSearchText.asStateFlow()
 
     private val _products = MutableStateFlow(ProductList(listOf()))
     private val _ogProducts = MutableStateFlow(ProductList(listOf()))
 
     private val _sort = MutableStateFlow(Sort.ASC)
 
-    @OptIn(FlowPreview::class)
-    val products = searchText
-        .debounce(300L)
-        .onEach { _isSearching.update { true } }
+    val products = submittedSearchText
         .combine(_products) { text, products ->
             if (text.isBlank()) {
                 products
             } else {
-                delay(500L)
                 val filterItem = products.products.filter {
                     it.doestMatchQuery(text)
                 }
                 ProductList(filterItem)
             }
         }
-        .onEach { _isSearching.update { false } }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -115,6 +106,15 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
+    }
+
+    fun submitSearch() {
+        _submittedSearchText.value = _searchText.value.trim()
+    }
+
+    fun exitSearch() {
+        _searchText.value = ""
+        _submittedSearchText.value = ""
     }
 
     private fun setProducts(products: ProductList) {

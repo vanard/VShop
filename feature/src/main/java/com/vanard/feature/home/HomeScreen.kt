@@ -2,6 +2,7 @@ package com.vanard.feature.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,16 +12,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -35,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +70,8 @@ import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.SearchAndFilterBar
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.theme.VShopBackground
+import com.vanard.ui.theme.VShopStroke
+import com.vanard.ui.theme.VShopSurface
 import com.vanard.ui.theme.VShopTextPrimary
 import com.vanard.ui.theme.VShopTextSecondary
 import com.vanard.ui.theme.VShopTextTertiary
@@ -123,25 +131,29 @@ private fun HomeContent(
                 val scrollState = rememberLazyListState()
                 val products by viewModel.products.collectAsState()
                 val searchText by viewModel.searchText.collectAsState()
-                val isSearching by viewModel.isSearching.collectAsState()
+                val submittedSearchText by viewModel.submittedSearchText.collectAsState()
 
                 fun openProduct(product: Product) {
                     navController.navigate(Screen.Detail.detailRoute(product.id))
                 }
+
+                val showSearchResults = submittedSearchText.isNotBlank()
 
                 LazyColumn(
                     state = scrollState,
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(HomeScreenTestTag.LAZY_LIST),
-                    contentPadding = PaddingValues(start = 20.dp, top = 18.dp, end = 20.dp, bottom = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(22.dp)
+                    contentPadding = PaddingValues(start = 16.dp, top = 18.dp, end = 16.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(if (showSearchResults) 20.dp else 22.dp)
                 ) {
-                    item {
-                        HomeLocationHeader(
-                            user = user,
-                            onProfileClick = { navController.navigate(Screen.Profile.route) }
-                        )
+                    if (!showSearchResults) {
+                        item {
+                            HomeLocationHeader(
+                                user = user,
+                                onProfileClick = { navController.navigate(Screen.Profile.route) }
+                            )
+                        }
                     }
 
                     item {
@@ -155,54 +167,85 @@ private fun HomeContent(
                                     scrollState.animateScrollToItem(0)
                                 }
                             },
-                            modifier = Modifier.testTag(HomeScreenTestTag.SEARCH)
-                        )
-                    }
-
-                    item { ProductCategories() }
-                    item { ExclusiveOffers() }
-                    item {
-                        ProductRowSection(
-                            title = "Trending Now",
-                            products = products.products.take(6),
-                            onSelectedProduct = ::openProduct,
-                            onFavClick = { product ->
-                                val message = if (product.isFavorite) {
-                                    "${product.title.firstWords(2)} has been removed from your favorites."
-                                } else {
-                                    "${product.title.firstWords(2)} has been added to your favorites."
+                            modifier = Modifier.testTag(HomeScreenTestTag.SEARCH),
+                            placeholder = if (showSearchResults) submittedSearchText else "Search Products",
+                            isSearchMode = showSearchResults,
+                            onSearchClick = {
+                                viewModel.submitSearch()
+                                coroutineScope.launch {
+                                    withFrameNanos { }
+                                    scrollState.animateScrollToItem(0)
                                 }
-                                viewModel.updateProductItem(product)
-                                context.toastMsg(message)
-                            }
-                        )
-                    }
-
-                    item {
-                        JustForYouFilters(
-                            selectedCategory = viewModel.selectedCategory.value,
-                            onSelectedCategory = {
-                                viewModel.selectCategory(getCategories(it))
-                            }
-                        )
-                    }
-
-                    if (isSearching) {
-                        item { LoadingSingleTop() }
-                    }
-
-                    productGridItems(
-                        items = products.products
-                    ) { index, product ->
-                        ShopItemContent(
-                            product = product,
-                            onSelectedProduct = { openProduct(product) },
-                            onFavClick = {
-                                viewModel.updateProductItem(product)
-                                context.toastMsg("${product.title.firstWords(2)} updated")
                             },
-                            badgeText = if (index % 3 == 0) "Featured" else null
+                            onExitSearchClick = viewModel::exitSearch
                         )
+                    }
+
+                    if (showSearchResults) {
+                        item { SearchResultFilters() }
+
+                        searchResultGridItems(
+                            items = products.products
+                        ) { index, product ->
+                            ShopItemContent(
+                                product = product,
+                                onSelectedProduct = { openProduct(product) },
+                                onFavClick = {
+                                    viewModel.updateProductItem(product)
+                                    context.toastMsg("${product.title.firstWords(2)} updated")
+                                },
+                                badgeText = when (index) {
+                                    0 -> "Featured"
+                                    3, 4 -> "Free Delivery"
+                                    else -> null
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    } else {
+                        item { ProductCategories() }
+                        item { ExclusiveOffers() }
+                        item {
+                            ProductRowSection(
+                                title = "Trending Now",
+                                products = products.products.take(6),
+                                onSelectedProduct = ::openProduct,
+                                onFavClick = { product ->
+                                    val message = if (product.isFavorite) {
+                                        "${product.title.firstWords(2)} has been removed from your favorites."
+                                    } else {
+                                        "${product.title.firstWords(2)} has been added to your favorites."
+                                    }
+                                    viewModel.updateProductItem(product)
+                                    context.toastMsg(message)
+                                }
+                            )
+                        }
+
+                        item {
+                            JustForYouFilters(
+                                selectedCategory = viewModel.selectedCategory.value,
+                                onSelectedCategory = {
+                                    viewModel.selectCategory(getCategories(it))
+                                }
+                            )
+                        }
+
+                        responsiveProductGridItems(
+                            items = products.products
+                        ) { index, product ->
+                            ShopItemContent(
+                                product = product,
+                                onSelectedProduct = { openProduct(product) },
+                                onFavClick = {
+                                    viewModel.updateProductItem(product)
+                                    context.toastMsg("${product.title.firstWords(2)} updated")
+                                },
+                                badgeText = if (index % 3 == 0) "Featured" else null,
+                                modifier = Modifier.fillMaxWidth(),
+                                fillWidth = true
+                            )
+                        }
                     }
                 }
             }
@@ -223,7 +266,13 @@ private fun HomeLoadingContent(viewModel: HomeViewModel) {
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         HomeLocationHeader(user = null, onProfileClick = {})
-        SearchAndFilterBar(query = "", onQueryChanged = viewModel::onSearchTextChange, onFilterClick = {})
+        SearchAndFilterBar(
+            query = "",
+            onQueryChanged = viewModel::onSearchTextChange,
+            onFilterClick = {},
+            onSearchClick = viewModel::submitSearch,
+            onExitSearchClick = viewModel::exitSearch
+        )
         ProductCategories()
         LoadingSingleTop()
     }
@@ -328,6 +377,56 @@ private fun ProductRowSection(
 }
 
 @Composable
+private fun SearchResultFilters() {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        SearchFilterPill(
+            text = "Sort By",
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.menu),
+                    tint = VShopTextPrimary,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+        )
+        SearchFilterPill(text = "Brand")
+        SearchFilterPill(text = "Ram Memory")
+        SearchFilterPill(text = "Storage")
+    }
+}
+
+@Composable
+private fun SearchFilterPill(
+    text: String,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .border(1.dp, VShopStroke, RoundedCornerShape(4.dp))
+            .background(VShopSurface)
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        leadingIcon?.invoke()
+        Text(text = text, color = VShopTextSecondary, fontSize = 14.sp)
+        Icon(
+            imageVector = Icons.Filled.KeyboardArrowDown,
+            tint = VShopTextSecondary,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
 private fun JustForYouFilters(
     selectedCategory: Categories?,
     onSelectedCategory: (String) -> Unit,
@@ -373,13 +472,40 @@ private fun SectionHeader(title: String, modifier: Modifier = Modifier) {
     }
 }
 
-private fun LazyListScope.productGridItems(
+private fun LazyListScope.responsiveProductGridItems(
+    items: List<Product>,
+    itemContent: @Composable (Int, Product) -> Unit,
+) {
+    item(key = "responsive-product-grid") {
+        val screenWidth = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
+        val columns = if (screenWidth >= 600.dp) 4 else 2
+        val rowSpacing = if (columns == 4) 24.dp else 22.dp
+        val columnSpacing = if (columns == 4) 16.dp else 14.dp
+
+        Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {
+            items.chunked(columns).forEachIndexed { rowIndex, rowItems ->
+                Row(horizontalArrangement = Arrangement.spacedBy(columnSpacing), modifier = Modifier.fillMaxWidth()) {
+                    rowItems.forEachIndexed { columnIndex, product ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            itemContent(rowIndex * columns + columnIndex, product)
+                        }
+                    }
+                    repeat(columns - rowItems.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun LazyListScope.searchResultGridItems(
     items: List<Product>,
     itemContent: @Composable (Int, Product) -> Unit,
 ) {
     items.chunked(2).forEachIndexed { rowIndex, rowItems ->
-        item(key = "grid-$rowIndex") {
-            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+        item(key = "search-grid-$rowIndex") {
+            Row(horizontalArrangement = Arrangement.spacedBy(22.dp), modifier = Modifier.fillMaxWidth()) {
                 rowItems.forEachIndexed { columnIndex, product ->
                     Box(modifier = Modifier.weight(1f)) {
                         itemContent(rowIndex * 2 + columnIndex, product)
