@@ -69,6 +69,7 @@ import com.vanard.ui.components.FilterChipButton
 import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.SearchAndFilterBar
 import com.vanard.ui.components.ShopItemContent
+import com.vanard.ui.components.responsiveProductGridItems
 import com.vanard.ui.theme.VShopBackground
 import com.vanard.ui.theme.VShopStroke
 import com.vanard.ui.theme.VShopSurface
@@ -144,7 +145,12 @@ private fun HomeContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(HomeScreenTestTag.LAZY_LIST),
-                    contentPadding = PaddingValues(start = 16.dp, top = 18.dp, end = 16.dp, bottom = 24.dp),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        top = 18.dp,
+                        end = 16.dp,
+                        bottom = 24.dp
+                    ),
                     verticalArrangement = Arrangement.spacedBy(if (showSearchResults) 20.dp else 22.dp)
                 ) {
                     if (!showSearchResults) {
@@ -182,24 +188,11 @@ private fun HomeContent(
                     }
 
                     if (showSearchResults) {
-                        item { SearchResultFilters() }
-
-                        searchResultGridItems(
-                            items = products.products
-                        ) { index, product ->
-                            ShopItemContent(
-                                product = product,
-                                onSelectedProduct = { openProduct(product) },
-                                onFavClick = {
-                                    viewModel.updateProductItem(product)
-                                    context.toastMsg("${product.title.firstWords(2)} updated")
-                                },
-                                badgeText = when (index) {
-                                    0 -> "Featured"
-                                    3, 4 -> "Free Delivery"
-                                    else -> null
-                                },
-                                modifier = Modifier.fillMaxWidth()
+                        item {
+                            SearchScreen(
+                                viewModel = viewModel,
+                                products = products,
+                                navController = navController,
                             )
                         }
                     } else {
@@ -346,10 +339,28 @@ private fun ProductCategories() {
 @Composable
 private fun ExclusiveOffers() {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(text = "Exclusive Offers", color = VShopTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-        Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-            FeaturedOfferCard(title = "20% OFF", subtitle = "Up to", action = "Shop Now", modifier = Modifier.width(220.dp))
-            FeaturedOfferCard(title = "40 USD", subtitle = "Order over $", action = "Cashback", modifier = Modifier.width(220.dp))
+        Text(
+            text = "Exclusive Offers",
+            color = VShopTextPrimary,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
+            FeaturedOfferCard(
+                title = "20% OFF",
+                subtitle = "Up to",
+                action = "Shop Now",
+                modifier = Modifier.width(220.dp)
+            )
+            FeaturedOfferCard(
+                title = "40 USD",
+                subtitle = "Order over $",
+                action = "Cashback",
+                modifier = Modifier.width(220.dp)
+            )
         }
     }
 }
@@ -377,63 +388,21 @@ private fun ProductRowSection(
 }
 
 @Composable
-private fun SearchResultFilters() {
-    Row(
-        modifier = Modifier.horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        SearchFilterPill(
-            text = "Sort By",
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.menu),
-                    tint = VShopTextPrimary,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-        )
-        SearchFilterPill(text = "Brand")
-        SearchFilterPill(text = "Ram Memory")
-        SearchFilterPill(text = "Storage")
-    }
-}
-
-@Composable
-private fun SearchFilterPill(
-    text: String,
-    modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
-) {
-    Row(
-        modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .border(1.dp, VShopStroke, RoundedCornerShape(4.dp))
-            .background(VShopSurface)
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        leadingIcon?.invoke()
-        Text(text = text, color = VShopTextSecondary, fontSize = 14.sp)
-        Icon(
-            imageVector = Icons.Filled.KeyboardArrowDown,
-            tint = VShopTextSecondary,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-        )
-    }
-}
-
-@Composable
 private fun JustForYouFilters(
     selectedCategory: Categories?,
     onSelectedCategory: (String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(text = "Just For You", color = VShopTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        Text(
+            text = "Just For You",
+            color = VShopTextPrimary,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
             FilterChipButton(text = "Filter") {
                 Icon(
                     painter = painterResource(R.drawable.setting_4),
@@ -468,53 +437,6 @@ private fun SectionHeader(title: String, modifier: Modifier = Modifier) {
         )
         TextButton(onClick = {}) {
             Text(text = "See All", color = VShopTextSecondary, fontSize = 12.sp)
-        }
-    }
-}
-
-private fun LazyListScope.responsiveProductGridItems(
-    items: List<Product>,
-    itemContent: @Composable (Int, Product) -> Unit,
-) {
-    item(key = "responsive-product-grid") {
-        val screenWidth = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
-        val columns = if (screenWidth >= 600.dp) 4 else 2
-        val rowSpacing = if (columns == 4) 24.dp else 22.dp
-        val columnSpacing = if (columns == 4) 16.dp else 14.dp
-
-        Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {
-            items.chunked(columns).forEachIndexed { rowIndex, rowItems ->
-                Row(horizontalArrangement = Arrangement.spacedBy(columnSpacing), modifier = Modifier.fillMaxWidth()) {
-                    rowItems.forEachIndexed { columnIndex, product ->
-                        Box(modifier = Modifier.weight(1f)) {
-                            itemContent(rowIndex * columns + columnIndex, product)
-                        }
-                    }
-                    repeat(columns - rowItems.size) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-    }
-}
-
-private fun LazyListScope.searchResultGridItems(
-    items: List<Product>,
-    itemContent: @Composable (Int, Product) -> Unit,
-) {
-    items.chunked(2).forEachIndexed { rowIndex, rowItems ->
-        item(key = "search-grid-$rowIndex") {
-            Row(horizontalArrangement = Arrangement.spacedBy(22.dp), modifier = Modifier.fillMaxWidth()) {
-                rowItems.forEachIndexed { columnIndex, product ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        itemContent(rowIndex * 2 + columnIndex, product)
-                    }
-                }
-                if (rowItems.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
         }
     }
 }

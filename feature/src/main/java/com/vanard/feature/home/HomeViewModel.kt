@@ -160,27 +160,16 @@ class HomeViewModel @Inject constructor(private val useCase: ProductUseCase) : B
 
     fun updateProductItem(product: Product) {
         safeScope.launch {
-//            Log.d(TAG, "pressFavorite before: $product")
-//            Log.d(TAG, "pressFavorite list before: \n${_products.value.products.take(3)}")
-            setLoading()
+            val updated = product.copy(isFavorite = !product.isFavorite)
             val updatedOgList = _ogProducts.value.products.map {
                 if (it.id == product.id) it.copy(isFavorite = !it.isFavorite)
                 else it
             }
 
             _ogProducts.value = ProductList(updatedOgList)
-//            selectCategory(_selectedCategory.value)
             refreshFilteredList()
 
-            product.apply {
-                isFavorite = !isFavorite
-            }
-            Log.d(TAG, "pressFavorite after: $product")
-
-            useCase.updateProduct(product)
-            delay(50)
-            setSuccess()
-            Log.d(TAG, "pressFavorite list after: \n${_products.value.products.take(3)}")
+            useCase.updateProduct(updated)
         }
     }
 
