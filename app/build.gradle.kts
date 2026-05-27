@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -31,12 +32,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
         isCoreLibraryDesugaringEnabled = true
-    }
-    kotlinOptions {
-        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -92,6 +90,17 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.hilt.navigation)
+
+    // Firebase BoM and Auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    // Security Crypto for encrypted storage
+    implementation(libs.androidx.security.crypto)
+    // DataStore Preferences
+    implementation(libs.datastore)
+    // Paging 3
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     implementation(libs.bundles.room)
 

@@ -27,11 +27,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -54,6 +51,14 @@ dependencies {
     //room
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
+
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    //security
+    implementation(libs.androidx.security.crypto)
 
     //datastore
     implementation(libs.datastore)

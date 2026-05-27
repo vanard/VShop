@@ -3,6 +3,7 @@ package com.vanard.data.di
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.vanard.common.constants.BASE_URL
+import com.vanard.data.preferences.SecureUserPreferencesManager
 import com.vanard.data.remote.CartService
 import com.vanard.data.remote.ProductService
 import dagger.Module
@@ -26,9 +27,10 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun getOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+    fun getOkHttpClient(@ApplicationContext context: Context, securePrefs: SecureUserPreferencesManager): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder()
         okHttpClient.addInterceptor(ChuckerInterceptor(context))
+        okHttpClient.addInterceptor(AuthTokenInterceptor(securePrefs))
         okHttpClient.callTimeout(10, TimeUnit.SECONDS)
         okHttpClient.connectTimeout(10, TimeUnit.SECONDS)
         okHttpClient.writeTimeout(10, TimeUnit.SECONDS)

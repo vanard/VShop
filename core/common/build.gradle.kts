@@ -24,11 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -37,9 +34,20 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Firebase BoM and Auth
+//    implementation(platform(libs.firebase.bom))
+//    implementation(libs.firebase.auth.ktx)
+    // Security Crypto for encrypted storage
+    implementation(libs.androidx.security.crypto)
+    // DataStore Preferences
+    implementation(libs.datastore)
 
     implementation(libs.bundles.retrofit)
 }

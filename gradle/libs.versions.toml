@@ -8,15 +8,20 @@ junitVersion = "1.1.5"
 espressoCore = "3.5.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2025.06.01"
+composeBom = "2026.05.01"
 
 ksp = "2.1.21-2.0.2"
 navigation-component = "2.8.9"
 #robolectric = "4.14.1"
 splashscreen = "1.2.0"
 datastore = "1.2.1"
-#paging = "3.3.6"
+paging = "3.3.6"
+securityCrypto = "1.1.0"
 room = "2.8.4"
+
+firebaseBom = "34.13.0"
+coroutinesPlayServices = "1.9.0"
+
 hilt = "2.57.1"
 hilt-navigation = "1.2.0"
 #coil3 = "3.1.0"
@@ -28,9 +33,14 @@ appcompat = "1.7.1"
 material = "1.12.0"
 material-icon = "1.7.8"
 uiTextAndroid = "1.10.5"
+
 uiTestJunit4Android = "1.8.0"
 navigationTesting = "2.8.9"
 runner = "1.6.2"
+googleGmsGoogleServices = "4.4.4"
+credentials = "1.6.0"
+credentialsPlayServicesAuth = "1.6.0"
+googleid = "1.2.0"
 #core = "1.48.0"
 
 [libraries]
@@ -51,10 +61,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 #
-#robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+#robolectric = { module = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
-
-#
 androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-component" }
 
 #
@@ -62,8 +70,6 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-
-#
 hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation" }
 
 #
@@ -73,16 +79,18 @@ moshi-converter = { group = "com.squareup.retrofit2", name = "converter-moshi", 
 
 #
 lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 
 #
 workmanager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "worker" }
-
-#
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
 
 #
-#paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging"}
-#paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging"}
+paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging"}
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging"}
 
 #
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -98,13 +106,16 @@ chucker-debug = { group = "com.github.chuckerteam.chucker", name = "library", ve
 chucker-release = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android" }
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 #core = { group = "com.google.ar", name = "core", version.ref = "core" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -120,6 +131,7 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 #
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 
 [bundles]
 retrofit = ["retrofit", "gson-converter", "moshi-converter"]

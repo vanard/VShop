@@ -1,10 +1,11 @@
 package com.vanard.data.di
 
 import android.content.Context
-import com.vanard.data.dao.UserDao
-import com.vanard.data.db.AppDatabase
+import com.google.firebase.auth.FirebaseAuth
+import com.vanard.data.preferences.EncryptionManager
+import com.vanard.data.preferences.SecureUserPreferencesManager
 import com.vanard.data.preferences.UserPreferencesManager
-import com.vanard.data.repositoryImpl.AuthRepositoryImpl
+import com.vanard.data.repositoryImpl.FirebaseAuthRepositoryImpl
 import com.vanard.domain.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
@@ -17,12 +18,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AuthModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideUserDao(database: AppDatabase): UserDao {
-//        return database.getUserDao()
-//    }
-
     @Provides
     @Singleton
     fun provideUserPreferencesManager(@ApplicationContext context: Context): UserPreferencesManager {
@@ -31,10 +26,29 @@ object AuthModule {
 
     @Provides
     @Singleton
+    fun provideEncryptionManager(@ApplicationContext context: Context): EncryptionManager {
+        return EncryptionManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideSecureUserPreferencesManager(
+        @ApplicationContext context: Context,
+        encryptionManager: EncryptionManager
+    ): SecureUserPreferencesManager {
+        return SecureUserPreferencesManager(context, encryptionManager)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(
-        userDao: UserDao,
-        preferencesManager: UserPreferencesManager
+        firebaseAuth: FirebaseAuth,
+        securePrefs: SecureUserPreferencesManager
     ): AuthRepository {
-        return AuthRepositoryImpl(userDao, preferencesManager)
+        return FirebaseAuthRepositoryImpl(firebaseAuth, securePrefs)
     }
 }
