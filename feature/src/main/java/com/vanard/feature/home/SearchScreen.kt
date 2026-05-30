@@ -1,46 +1,39 @@
 package com.vanard.feature.home
 
+import android.content.Context
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.vanard.common.Screen
 import com.vanard.common.util.firstWords
 import com.vanard.common.util.toastMsg
-import com.vanard.domain.model.Product
 import com.vanard.domain.model.ProductList
 import com.vanard.resources.R
 import com.vanard.ui.components.SearchFilterPill
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.components.responsiveProductGridItems
 import com.vanard.ui.theme.VShopTextPrimary
-import kotlinx.coroutines.CoroutineScope
 
-@Composable
 fun LazyListScope.SearchScreen(
     viewModel: HomeViewModel,
     products: ProductList,
     navController: NavController,
+    context: Context,
 ) {
-    // Context for toast messages
-    val context = LocalContext.current
-
     // Search results header
-    SearchResultFilters()
+    item {
+        SearchResultFilters()
+    }
 
     // Render the product grid for search results
     responsiveProductGridItems(
@@ -69,7 +62,7 @@ fun LazyListScope.SearchScreen(
 private fun SearchResultFilters() {
     Row(
         modifier = Modifier.horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         SearchFilterPill(
             text = "Sort By",
@@ -85,25 +78,5 @@ private fun SearchResultFilters() {
         SearchFilterPill(text = "Brand")
         SearchFilterPill(text = "Ram Memory")
         SearchFilterPill(text = "Storage")
-    }
-}
-
-private fun LazyListScope.searchResultGridItems(
-    items: List<Product>,
-    itemContent: @Composable (Int, Product) -> Unit,
-) {
-    items.chunked(2).forEachIndexed { rowIndex, rowItems ->
-        item(key = "search-grid-$rowIndex") {
-            Row(horizontalArrangement = Arrangement.spacedBy(22.dp), modifier = Modifier.fillMaxWidth()) {
-                rowItems.forEachIndexed { columnIndex, product ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        itemContent(rowIndex * 2 + columnIndex, product)
-                    }
-                }
-                if (rowItems.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
     }
 }
