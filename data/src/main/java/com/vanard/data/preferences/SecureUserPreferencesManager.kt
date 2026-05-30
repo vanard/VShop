@@ -22,7 +22,7 @@ class SecureUserPreferencesManager @Inject constructor(
     suspend fun saveAuthToken(token: String) {
         val encryptedToken = encryptionManager.encrypt(token)
         context.secureDataStore.edit { prefs ->
-            prefs[KEY_AUTH_TOKEN] = encryptedToken
+            prefs[KEY_AUTH_TOKEN] = encryptedToken ?: ""
         }
     }
 
@@ -37,12 +37,6 @@ class SecureUserPreferencesManager @Inject constructor(
             prefs[KEY_AUTH_TOKEN]
         }.first()
 
-        return encryptedToken?.let {
-            try {
-                encryptionManager.decrypt(it)
-            } catch (e: Exception) {
-                null
-            }
-        }
+        return encryptionManager.decryptOrNull(encryptedToken)
     }
 }

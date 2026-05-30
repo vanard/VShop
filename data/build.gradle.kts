@@ -59,6 +59,7 @@ dependencies {
 
     //security
     implementation(libs.androidx.security.crypto)
+    implementation(libs.tink.android)
 
     //datastore
     implementation(libs.datastore)
