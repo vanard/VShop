@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +35,7 @@ import com.vanard.domain.model.Product
 import com.vanard.domain.model.dummyProduct
 import com.vanard.resources.R
 import com.vanard.ui.theme.VShopDark
+import com.vanard.ui.theme.VShopPrimary
 import com.vanard.ui.theme.VShopSoftSurface
 import com.vanard.ui.theme.VShopSurface
 import com.vanard.ui.theme.VShopTextPrimary
@@ -130,13 +132,26 @@ fun ShopItemContent(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 4.dp)
         )
-        Text(
-            text = "$${product.price}",
-            color = VShopTextPrimary,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 2.dp)
-        )
+        ) {
+            Text(
+                text = "$${product.price}",
+                color = VShopPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            product.originalPrice?.let { original ->
+                Text(
+                    text = " $$original",
+                    color = VShopTextTertiary,
+                    fontSize = 10.sp,
+                    textDecoration = TextDecoration.LineThrough,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
     }
 }
 

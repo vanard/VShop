@@ -34,6 +34,7 @@ import com.vanard.feature.home.HomeScreen
 import com.vanard.feature.profile.ProfileScreen
 import com.vanard.feature.wishlist.WishlistScreen
 import com.vanard.ui.theme.VShopBackground
+import com.vanard.ui.theme.VShopPrimary
 import com.vanard.ui.theme.VShopSurface
 import com.vanard.ui.theme.VShopTextPrimary
 import com.vanard.ui.theme.VShopTextSecondary
@@ -111,11 +112,11 @@ private fun VShopBottomBar(
                    navigateToRoute(item.screen.route)
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = VShopTextPrimary,
+                    selectedIconColor = Color.White,
                     unselectedIconColor = VShopTextSecondary,
-                    selectedTextColor = VShopTextPrimary,
+                    selectedTextColor = Color.White,
                     unselectedTextColor = VShopTextSecondary,
-                    indicatorColor = Color.Transparent,
+                    indicatorColor = VShopPrimary,
                 )
             )
         }

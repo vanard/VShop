@@ -12,13 +12,15 @@ val Pink40 = Color(0xFF7D5260)
 
 val Yellow = Color(0xfff2c94c)
 
-val VShopBackground = Color(0xFFF7F7F8)
-val VShopSurface = Color(0xFFFFFFFF)
-val VShopSoftSurface = Color(0xFFEDEDED)
-val VShopSoftSurfaceAlt = Color(0xFFF2F2F2)
-val VShopTextPrimary = Color(0xFF171717)
-val VShopTextSecondary = Color(0xFF6F6F6F)
-val VShopTextTertiary = Color(0xFF9A9A9A)
-val VShopStroke = Color(0xFFE0E0E0)
-val VShopDark = Color(0xFF5E5E5E)
-val VShopChip = Color(0xFFFAFAFA)
+// Figma Theme Colors
+val VShopPrimary = Color(0xFFF97316) // Orange
+val VShopBackground = Color(0xFFFFFFFF) // White
+val VShopSurface = Color(0xFFF9FAFB) // Very Light Gray
+val VShopSoftSurface = Color(0xFFF3F4F6) // Grayish White
+val VShopTextPrimary = Color(0xFF0F172A) // Dark Navy
+val VShopTextSecondary = Color(0xFF6B7280) // Gray
+val VShopTextTertiary = Color(0xFF9CA3AF) // Lighter Gray
+val VShopDark = Color(0xFF000000) // Black
+val VShopStroke = Color(0xFFE5E7EB) // Light Stroke
+val VShopHeroStart = Color(0xFFF0F7FF) // Light Blue Gradient Start
+val VShopHeroEnd = Color(0xFFE2EFFF) // Light Blue Gradient End

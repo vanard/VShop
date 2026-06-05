@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import com.vanard.resources.R
+import com.vanard.ui.theme.VShopPrimary
 import com.vanard.ui.theme.VShopSoftSurface
 import com.vanard.ui.theme.VShopTextPrimary
 import com.vanard.ui.theme.VShopTextSecondary
@@ -58,7 +59,7 @@ fun CustomSearchBar(
         onValueChange = onQueryChanged,
         modifier = modifier
             .height(52.dp)
-            .clip(RoundedCornerShape(18.dp)),
+            .clip(RoundedCornerShape(24.dp)),
         leadingIcon = {
             if (onLeadingIconClick == null) {
                 leadingIcon()
@@ -129,11 +130,11 @@ fun SearchAndFilterBar(
                 .padding(start = 12.dp)
                 .size(52.dp)
                 .clip(CircleShape)
-                .background(VShopSoftSurface)
+                .background(VShopPrimary)
         ) {
             Icon(
                 painter = painterResource(if (isSearchMode) R.drawable.setting_4 else R.drawable.search_normal),
-                tint = VShopTextPrimary,
+                tint = Color.White,
                 contentDescription = if (isSearchMode) "Filter" else "Search",
                 modifier = Modifier.size(22.dp)
             )

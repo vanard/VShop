@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +20,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -62,7 +65,14 @@ import com.vanard.ui.components.LoadingSingleTop
 import com.vanard.ui.components.SearchAndFilterBar
 import com.vanard.ui.components.ShopItemContent
 import com.vanard.ui.components.responsiveProductGridItems
+import androidx.compose.ui.graphics.Color
+import com.vanard.ui.components.HeroPromoBanner
+import com.vanard.ui.components.Spacer
 import com.vanard.ui.theme.VShopBackground
+import com.vanard.ui.theme.VShopDark
+import com.vanard.ui.theme.VShopPrimary
+import com.vanard.ui.theme.VShopStroke
+import com.vanard.ui.theme.VShopSurface
 import com.vanard.ui.theme.VShopTextPrimary
 import com.vanard.ui.theme.VShopTextSecondary
 import com.vanard.ui.theme.VShopTextTertiary
@@ -145,10 +155,7 @@ private fun HomeContent(
                 ) {
                     if (!showSearchResults) {
                         item {
-                            HomeLocationHeader(
-                                user = user,
-                                onProfileClick = { navController.navigate(Screen.Profile.route) }
-                            )
+                            HomeHeader(onProfileClick = { navController.navigate(Screen.Profile.route) })
                         }
                     }
 
@@ -185,48 +192,26 @@ private fun HomeContent(
                             context = context
                         )
                     } else {
-                        item { ProductCategories() }
-                        item { ExclusiveOffers() }
                         item {
-                            ProductRowSection(
-                                title = "Trending Now",
-                                products = products.products.take(6),
+                            HeroPromoBanner(
+                                title = "Adidas Campus",
+                                description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+                                onActionClick = { /* Handle action */ }
+                            )
+                        }
+                        item {
+                            MostPopularSection(
+                                title = "Most Popular",
+                                products = products.products,
                                 onSelectedProduct = ::openProduct,
                                 onFavClick = { product ->
-                                    val message = if (product.isFavorite) {
-                                        "${product.title.firstWords(2)} has been removed from your favorites."
-                                    } else {
-                                        "${product.title.firstWords(2)} has been added to your favorites."
-                                    }
-                                    viewModel.updateProductItem(product)
-                                    context.toastMsg(message)
-                                }
-                            )
-                        }
-
-                        item {
-                            JustForYouFilters(
-                                selectedCategory = viewModel.selectedCategory.value,
-                                onSelectedCategory = {
-                                    viewModel.selectCategory(getCategories(it))
-                                }
-                            )
-                        }
-
-                        responsiveProductGridItems(
-                            items = products.products
-                        ) { index, product ->
-                            ShopItemContent(
-                                product = product,
-                                onSelectedProduct = { openProduct(product) },
-                                onFavClick = {
                                     viewModel.updateProductItem(product)
                                     context.toastMsg("${product.title.firstWords(2)} updated")
-                                },
-                                badgeText = if (index % 3 == 0) "Featured" else null,
-                                modifier = Modifier.fillMaxWidth(),
-                                fillWidth = true
+                                }
                             )
+                        }
+                        item {
+                            BrandFeatureSection()
                         }
                     }
                 }
@@ -247,7 +232,7 @@ private fun HomeLoadingContent(viewModel: HomeViewModel) {
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        HomeLocationHeader(user = null, onProfileClick = {})
+        HomeHeader(onProfileClick = {})
         SearchAndFilterBar(
             query = "",
             onQueryChanged = viewModel::onSearchTextChange,
@@ -255,42 +240,23 @@ private fun HomeLoadingContent(viewModel: HomeViewModel) {
             onSearchClick = viewModel::submitSearch,
             onExitSearchClick = viewModel::exitSearch
         )
-        ProductCategories()
         LoadingSingleTop()
     }
 }
 
 @Composable
-private fun HomeLocationHeader(
-    user: User?,
-    onProfileClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun HomeHeader(onProfileClick: () -> Unit) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Current Location", color = VShopTextTertiary, fontSize = 10.sp)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = user?.let { "${it.firstName} City" } ?: "Waterloo, Canada",
-                    color = VShopTextPrimary,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Icon(
-                    painter = painterResource(R.drawable.arrow_right_1),
-                    contentDescription = null,
-                    tint = VShopTextPrimary,
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .size(13.dp)
-                )
-            }
-        }
+        Text(
+            text = "Current User",
+            color = VShopTextPrimary,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
         IconButton(onClick = onProfileClick, modifier = Modifier.size(40.dp)) {
             Icon(
                 painter = painterResource(R.drawable.profile_circle),
@@ -303,59 +269,7 @@ private fun HomeLocationHeader(
 }
 
 @Composable
-private fun ProductCategories() {
-    val categories = listOf(
-        "Watch" to R.drawable.shopping_bag,
-        "Mobile" to R.drawable.ic_phone,
-        "Books" to R.drawable.category,
-        "Cars" to R.drawable.shopping_cart,
-        "Laptop" to R.drawable.profile_bulk,
-    )
-
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SectionHeader(title = "Product Categories")
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            categories.forEach { (title, icon) ->
-                CategoryIconItem(title = title, iconRes = icon)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExclusiveOffers() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = "Exclusive Offers",
-            color = VShopTextPrimary,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ) {
-            FeaturedOfferCard(
-                title = "20% OFF",
-                subtitle = "Up to",
-                action = "Shop Now",
-                modifier = Modifier.width(220.dp)
-            )
-            FeaturedOfferCard(
-                title = "40 USD",
-                subtitle = "Order over $",
-                action = "Cashback",
-                modifier = Modifier.width(220.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ProductRowSection(
+private fun MostPopularSection(
     title: String,
     products: List<Product>,
     onSelectedProduct: (Product) -> Unit,
@@ -363,48 +277,68 @@ private fun ProductRowSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionHeader(title = title)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            itemsIndexed(products, key = { _, item -> item.id }) { index, product ->
-                ShopItemContent(
-                    product = product,
-                    onSelectedProduct = { onSelectedProduct(product) },
-                    onFavClick = { onFavClick(product) },
-                    badgeText = if (index == 0) "4.9(2k)" else null
-                )
+        products.chunked(2).forEach { rowProducts ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                rowProducts.forEach { product ->
+                    ShopItemContent(
+                        product = product,
+                        onSelectedProduct = { onSelectedProduct(product) },
+                        onFavClick = { onFavClick(product) },
+                        modifier = Modifier.weight(1f),
+                        fillWidth = true
+                    )
+                }
+                if (rowProducts.size < 2) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun JustForYouFilters(
-    selectedCategory: Categories?,
-    onSelectedCategory: (String) -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = "Just For You",
-            color = VShopTextPrimary,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.horizontalScroll(rememberScrollState())
+private fun BrandFeatureSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(VShopSurface)
+            .padding(20.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            FilterChipButton(text = "Filter") {
-                Icon(
-                    painter = painterResource(R.drawable.setting_4),
-                    tint = VShopTextSecondary,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-            getAllCategories().forEach { category ->
-                FilterChipButton(
-                    text = if (category == selectedCategory) "${category.value} ✓" else category.value,
-                    onClick = { onSelectedCategory(category.value) },
-                    modifier = Modifier.clip(RoundedCornerShape(6.dp))
+            Text(
+                text = "POPULAR BRAND",
+                color = VShopTextSecondary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Lorem Ipsum Dolor",
+                color = VShopTextPrimary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                color = VShopTextSecondary,
+                fontSize = 14.sp
+            )
+            Button(
+                onClick = { /* TODO */ },
+                colors = ButtonDefaults.buttonColors(containerColor = VShopPrimary),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text(
+                    text = "View Collections",
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
