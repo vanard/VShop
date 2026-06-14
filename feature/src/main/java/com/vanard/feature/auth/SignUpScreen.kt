@@ -146,7 +146,7 @@ fun SignUpScreen(
                 // First Name Field
                 SignUpFormTextField(
                     value = firstName,
-                    onValueChange = { firstName = it },
+                    onValueChange = { firstName = it.trim() },
                     label = "First Name",
                     leadingIcon = painterResource(R.drawable.profile),
                     modifier = Modifier.fillMaxWidth()
@@ -157,7 +157,7 @@ fun SignUpScreen(
                 // Last Name Field
                 SignUpFormTextField(
                     value = lastName,
-                    onValueChange = { lastName = it },
+                    onValueChange = { lastName = it.trim() },
                     label = "Last Name",
                     leadingIcon = painterResource(R.drawable.profile),
                     modifier = Modifier.fillMaxWidth()
@@ -168,7 +168,7 @@ fun SignUpScreen(
                 // Email Field
                 SignUpFormEmailField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it.trim() },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -177,7 +177,7 @@ fun SignUpScreen(
                 // Phone Field (Optional)
                 SignUpFormPhoneField(
                     value = phone,
-                    onValueChange = { phone = it },
+                    onValueChange = { phone = it.trim() },
                     label = "Phone (Optional)",
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -187,7 +187,7 @@ fun SignUpScreen(
                 // Password Field
                 SignUpFormPasswordField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it.trim() },
                     label = "Password",
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
@@ -199,7 +199,7 @@ fun SignUpScreen(
                 // Confirm Password Field
                 SignUpFormPasswordField(
                     value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    onValueChange = { confirmPassword = it.trim() },
                     label = "Confirm Password",
                     passwordVisible = confirmPasswordVisible,
                     onPasswordVisibilityToggle = {
