@@ -141,7 +141,7 @@ fun LoginScreen(
                 // Email Field
                 SignUpFormEmailField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it.trim() },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -150,7 +150,7 @@ fun LoginScreen(
                 // Password Field
                 SignUpFormPasswordField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it.trim() },
                     label = "Password",
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
